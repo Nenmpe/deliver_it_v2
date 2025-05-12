@@ -58,7 +58,9 @@ class OrderSerializer(serializers.ModelSerializer):
         # ✅ Save path as LineString for admin map visualization
         path_coords = result['path_coords']
         if path_coords:
-            validated_data['delivery_path'] = LineString(path_coords)
+            line_coords = [(lon, lat) for lat, lon in path_coords]
+            validated_data['path_coords'] = line_coords  # still save for response
+            validated_data['delivery_path'] = LineString(line_coords)
 
         # Create the order
         order = Order.objects.create(**validated_data)
