@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'driver',
     'items',
     'orders',
+    'account',
 ]
 
 AUTH_USER_MODEL = 'users.User'

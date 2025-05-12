@@ -9,4 +9,6 @@ urlpatterns = [
     path('api/driver/', include('driver.urls')),
     path('api/inventory/', include('items.urls')),
     path('api/delivery/', include('orders.urls')),
+    
+    path('api/account/', include('account.urls')),
 ]
