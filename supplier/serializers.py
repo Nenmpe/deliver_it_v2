@@ -2,6 +2,8 @@ import uuid
 from rest_framework import serializers
 from users.models import User
 from supplier.models import Supplier
+from customer.models import Customer
+from driver.models import Driver
 from django.contrib.gis.geos import Point
 from django.contrib.auth import authenticate
 
@@ -55,3 +57,35 @@ class SupplierSigninSerializer(serializers.Serializer):
             raise serializers.ValidationError('Not a supplier account')
         data['user'] = user
         return data
+
+class CustomerListSerializer(serializers.ModelSerializer):
+    uid = serializers.UUIDField(source='customer.uid')
+    country = serializers.CharField(source='customer.country')
+    state = serializers.CharField(source='customer.state')
+    city = serializers.CharField(source='customer.city')
+
+    class Meta:
+        model = User
+        fields = ['uid', 'email', 'fullname', 'contact_no', 'address', 'country', 'state', 'city']
+
+class DriverListSerializer(serializers.ModelSerializer):
+    uid = serializers.UUIDField(source='driver.uid')
+    vehicle_type = serializers.CharField(source='driver.vehicle_type')
+    driving_license_no = serializers.CharField(source='driver.driving_license_no')
+    vehicle_speed = serializers.DecimalField(source='driver.vehicle_speed', max_digits=5, decimal_places=2)
+    location = serializers.SerializerMethodField()
+    status = serializers.CharField(source='driver.status')
+
+    class Meta:
+        model = User
+        fields = ['uid', 'email', 'fullname', 'contact_no', 'address', 
+                 'vehicle_type', 'driving_license_no', 'vehicle_speed', 
+                 'location', 'status']
+
+    def get_location(self, obj):
+        if obj.driver.location:
+            return {
+                'type': 'Point',
+                'coordinates': [obj.driver.location.x, obj.driver.location.y]
+            }
+        return None

@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from supplier.serializers import SupplierSignupSerializer
+from supplier.serializers import SupplierSignupSerializer, CustomerListSerializer, DriverListSerializer
 from users.serializers import CustomTokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsSupplier
+from users.models import User
 
 class SupplierSignupView(APIView):
     def post(self, request):
@@ -38,4 +39,30 @@ class SupplierDashboardView(APIView):
     def get(self, request):
         return Response({
             "message": f"Welcome Supplier {request.user.fullname}"
+        })
+
+
+class CustomerListView(APIView):
+    permission_classes = [IsAuthenticated, IsSupplier]
+
+    def get(self, request):
+        customers = User.objects.filter(is_customer=True)
+        serializer = CustomerListSerializer(customers, many=True)
+        return Response({
+            'status': 'success',
+            'message': 'Customers retrieved successfully',
+            'data': serializer.data
+        })
+
+
+class DriverListView(APIView):
+    permission_classes = [IsAuthenticated, IsSupplier]
+
+    def get(self, request):
+        drivers = User.objects.filter(is_driver=True)
+        serializer = DriverListSerializer(drivers, many=True)
+        return Response({
+            'status': 'success',
+            'message': 'Drivers retrieved successfully',
+            'data': serializer.data
         })
