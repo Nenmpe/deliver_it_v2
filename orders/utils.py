@@ -1,13 +1,62 @@
-from django.contrib.gis.geos import Point, LineString
-from django.contrib.gis.db.models.functions import Distance
+import osmnx as ox
+import networkx as nx
 from driver.models import Driver
+from django.contrib.gis.db.models.functions import Distance
 from geopy.distance import geodesic
 from datetime import timedelta, datetime
 import heapq
-# Add these new imports
 from routingpy import OSRM
 from routingpy.exceptions import RouterApiError
 import logging
+
+def get_osm_route(start_point, end_point):
+    """Get route using Dijkstra's algorithm on real OpenStreetMap data"""
+    try:
+        # Convert points to lat/lon format
+        start_lat, start_lon = start_point.y, start_point.x
+        end_lat, end_lon = end_point.y, end_point.x
+        
+        # Get the street network around the points
+        # Buffer distance in meters to ensure we capture enough of the network
+        center_lat = (start_lat + end_lat) / 2
+        center_lon = (start_lon + end_lon) / 2
+        dist = max(abs(start_lat - end_lat), abs(start_lon - end_lon)) * 111000 * 1.5  # Convert to meters with buffer
+        
+        # Download and create the graph from OSM data
+        G = ox.graph_from_point((center_lat, center_lon), dist=dist, network_type='drive')
+        
+        # Get nearest nodes to start and end points
+        start_node = ox.nearest_nodes(G, start_lon, start_lat)
+        end_node = ox.nearest_nodes(G, end_lon, end_lat)
+        
+        # Calculate shortest path using Dijkstra's algorithm
+        route = nx.shortest_path(G, start_node, end_node, weight='length', method='dijkstra')
+        
+        # Get the route coordinates
+        path_coords = []
+        for node in route:
+            # Get node coordinates and convert to [lon, lat] format
+            lon, lat = G.nodes[node]['x'], G.nodes[node]['y']
+            path_coords.append([lon, lat])
+        
+        # Calculate total distance in meters
+        distance_m = sum(ox.utils_graph.get_route_edge_attributes(G, route, 'length'))
+        distance_km = distance_m / 1000
+        
+        # Estimate time based on distance and average speed (50 km/h)
+        hours = distance_km / 50  # Assuming average speed of 50 km/h
+        estimated_time = timedelta(hours=hours)
+        
+        return {
+            'total_distance_km': round(distance_km, 2),
+            'estimated_time': estimated_time,
+            'path_coords': path_coords
+        }
+        
+    except Exception as e:
+        logger.error(f"OSM routing error: {str(e)}")
+        # Fall back to haversine distance if OSM routing fails
+        return fallback_route(start_point, end_point)
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -51,37 +100,6 @@ def calculate_time(distance_km, speed_kmph, traffic_multiplier=1.0):
     """
     hours = (float(distance_km) / float(speed_kmph)) * traffic_multiplier
     return timedelta(hours=hours)
-
-
-def dijkstra_shortest_path(graph, start, end):
-    """
-    Simple Dijkstra algorithm implementation for shortest path.
-    Graph format:
-        {
-            'A': {'B': distance_km, 'C': distance_km},
-            'B': {'A': distance_km, 'C': distance_km, 'D': distance_km},
-            ...
-        }
-    Returns: (total_distance, path_list)
-    """
-    queue = [(0, start, [])]
-    visited = set()
-
-    while queue:
-        (dist, current, path) = heapq.heappop(queue)
-        if current in visited:
-            continue
-        visited.add(current)
-        path = path + [current]
-
-        if current == end:
-            return dist, path
-
-        for neighbor, neighbor_dist in graph.get(current, {}).items():
-            if neighbor not in visited:
-                heapq.heappush(queue, (dist + neighbor_dist, neighbor, path))
-
-    return float('inf'), []
 
 
 def get_osrm_route(start_point, end_point):

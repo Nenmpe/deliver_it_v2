@@ -114,7 +114,6 @@ dependencies:
   - tk=8.6.13=h5226925_1
   - tomli=2.0.1=py312haa95532_1
   - typing_extensions=4.12.2=py312haa95532_0
-  - tzdata=2025a=h04d1e81_0
   - ucrt=10.0.20348.0=haa95532_0
   - uriparser=0.9.8=h5a68840_0
   - urllib3=2.3.0=py312haa95532_0
@@ -141,9 +140,19 @@ dependencies:
       - djangorestframework-gis==1.1
       - djangorestframework-simplejwt==5.4.0
       - geographiclib==2.0
+      - geopandas==1.1.0
       - geopy==2.4.1
       - msgpack==1.1.0
+      - networkx==3.5
+      - osmnx==2.0.3
+      - pandas==2.2.3
       - pillow==11.1.0
       - postgis==1.0.4
+      - pyogrio==0.11.0
+      - pyproj==3.7.1
+      - python-dateutil==2.9.0.post0
+      - pytz==2025.2
       - redis==5.2.1
+      - shapely==2.1.1
+      - tzdata==2025.2
 prefix: C:\Users\mikel\miniconda3\envs\venv
