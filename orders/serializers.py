@@ -44,7 +44,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         validated_data['driver'] = driver
 
-        # Calculate path, time, and distance using Dijkstra
+        # Calculate path, time, and distance using OSRM
         result = generate_path_matrix(
             delivery_points=[delivery_location],
             start_point=driver.location,
@@ -58,9 +58,14 @@ class OrderSerializer(serializers.ModelSerializer):
         # ✅ Save path as LineString for admin map visualization
         path_coords = result['path_coords']
         if path_coords:
-            line_coords = [(lon, lat) for lat, lon in path_coords]
-            validated_data['path_coords'] = line_coords  # still save for response
-            validated_data['delivery_path'] = LineString(line_coords)
+            # Debug print to check what coordinates we're getting
+            print(f"Path coordinates count: {len(path_coords)}")
+            print(f"First few coordinates: {path_coords[:3]}")
+            
+            # OSRM already returns (lon, lat) which is what LineString needs
+            # No need to swap coordinates
+            validated_data['path_coords'] = path_coords  # Save original format for API response
+            validated_data['delivery_path'] = LineString(path_coords)  # Convert for GIS
 
         # Create the order
         order = Order.objects.create(**validated_data)
