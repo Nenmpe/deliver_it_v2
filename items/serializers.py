@@ -5,7 +5,7 @@ class ItemSerializer(ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
-        read_only_fields = ['uid', 'created_at', 'updated_at']
+        read_only_fields = ['uid', 'created_at', 'updated_at', 'supplier']
 
     def create(self, validated_data):
         item = Item.objects.create(**validated_data)
