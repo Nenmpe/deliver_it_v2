@@ -1,74 +1,111 @@
 import osmnx as ox
 import networkx as nx
-from driver.models import Driver
 from django.contrib.gis.db.models.functions import Distance
+from routingpy import OSRM
+from routingpy.exceptions import RouterApiError
+from django.contrib.gis.geos import Point, LineString
+from driver.models import Driver
 from geopy.distance import geodesic
 from datetime import timedelta, datetime
 import heapq
-from routingpy import OSRM
-from routingpy.exceptions import RouterApiError
 import logging
+import pickle
+import os
+from hashlib import md5
 
-def get_osm_route(start_point, end_point):
-    """Get route using Dijkstra's algorithm on real OpenStreetMap data"""
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+CACHE_DIR = "graph_cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+
+def load_or_create_graph(center_lat, center_lon, dist):
+    """
+    Load OSM graph from cache or download and cache it.
+    Uses rounded center and distance as a key.
+    """
+    key = f"{round(center_lat, 4)}_{round(center_lon, 4)}_{int(dist)}"
+    filename = os.path.join(CACHE_DIR, md5(key.encode()).hexdigest() + ".pkl")
+
+    if os.path.exists(filename):
+        with open(filename, 'rb') as f:
+            return pickle.load(f)
+
+    G = ox.graph_from_point((center_lat, center_lon), dist=dist, network_type='drive')
+    with open(filename, 'wb') as f:
+        pickle.dump(G, f)
+
+    return G
+
+
+def get_osm_route(start_point, end_point, vehicle_speed_kmph=50):
+    """
+    Computes the shortest path using cached OSM graph and returns route info with steps.
+    """
     try:
-        # Convert points to lat/lon format
         start_lat, start_lon = start_point.y, start_point.x
         end_lat, end_lon = end_point.y, end_point.x
-        
-        # Get the street network around the points
-        # Buffer distance in meters to ensure we capture enough of the network
+
         center_lat = (start_lat + end_lat) / 2
         center_lon = (start_lon + end_lon) / 2
-        dist = max(abs(start_lat - end_lat), abs(start_lon - end_lon)) * 111000 * 1.5  # Convert to meters with buffer
-        
-        # Download and create the graph from OSM data
-        G = ox.graph_from_point((center_lat, center_lon), dist=dist, network_type='drive')
-        
-        # Get nearest nodes to start and end points
+        dist = max(abs(start_lat - end_lat), abs(start_lon - end_lon)) * 111000 * 1.5
+
+        G = load_or_create_graph(center_lat, center_lon, dist)
+
         start_node = ox.nearest_nodes(G, start_lon, start_lat)
         end_node = ox.nearest_nodes(G, end_lon, end_lat)
-        
-        # Calculate shortest path using Dijkstra's algorithm
+
         route = nx.shortest_path(G, start_node, end_node, weight='length', method='dijkstra')
-        
-        # Get the route coordinates
+        route_edges = list(zip(route[:-1], route[1:]))
+
+        # Generate path and steps
         path_coords = []
-        for node in route:
-            # Get node coordinates and convert to [lon, lat] format
-            lon, lat = G.nodes[node]['x'], G.nodes[node]['y']
-            path_coords.append([lon, lat])
-        
-        # Calculate total distance in meters
-        distance_m = sum(ox.utils_graph.get_route_edge_attributes(G, route, 'length'))
-        distance_km = distance_m / 1000
-        
-        # Estimate time based on distance and average speed (50 km/h)
-        hours = distance_km / 50  # Assuming average speed of 50 km/h
-        estimated_time = timedelta(hours=hours)
-        
+        steps = []
+        total_length = 0
+
+        for u, v in route_edges:
+            edge_data = G.get_edge_data(u, v, 0)  # take first if multiple edges
+            geometry = edge_data.get("geometry")
+
+            if geometry:
+                coords = list(geometry.coords)
+                for latlon in coords:
+                    path_coords.append([latlon[0], latlon[1]])  # [lat, lon]
+            else:
+                u_data = G.nodes[u]
+                v_data = G.nodes[v]
+                path_coords.append([u_data['x'], u_data['y']])
+                path_coords.append([v_data['x'], v_data['y']])
+            # Add step info
+            step_length = edge_data['length']
+            total_length += step_length
+            steps.append({
+                'from': [G.nodes[u]['y'], G.nodes[u]['x']],
+                'to': [G.nodes[v]['y'], G.nodes[v]['x']],
+                'length_m': round(step_length, 1),
+                'highway': edge_data.get('highway'),
+                'name': edge_data.get('name', 'Unnamed road'),
+            })
+
+        distance_km = total_length / 1000.0
+        estimated_time = timedelta(hours=distance_km / float(vehicle_speed_kmph))
+
         return {
             'total_distance_km': round(distance_km, 2),
             'estimated_time': estimated_time,
-            'path_coords': path_coords
+            'path_coords': path_coords,
+            'steps': steps  # NEW: step-level detail
         }
-        
+
     except Exception as e:
         logger.error(f"OSM routing error: {str(e)}")
-        # Fall back to haversine distance if OSM routing fails
-        return fallback_route(start_point, end_point)
-
-# Set up logging
-logger = logging.getLogger(__name__)
-
-# Initialize OSRM client - using the public API
-# You can change this to your own OSRM server if you have one
-osrm_client = OSRM()
+        return None
 
 
 def get_nearest_driver(delivery_point):
     """
-    Returns the nearest available driver based on current location.
+    Finds the nearest available driver to a given point.
     """
     drivers = Driver.objects.filter(status='available').annotate(
         distance=Distance('location', delivery_point)
@@ -79,12 +116,10 @@ def get_nearest_driver(delivery_point):
 
 def get_traffic_multiplier():
     """
-    Returns a traffic multiplier based on the current time of day.
+    Returns a traffic multiplier based on current time of day.
     """
-    now = datetime.now().hour
-    if 7 <= now <= 9 or 17 <= now <= 19:
-        return 2.0  # Rush hour
-    return 1.0  # Normal traffic
+    hour = datetime.now().hour
+    return 2.0 if 7 <= hour <= 9 or 17 <= hour <= 19 else 1.0
 
 
 def haversine_distance_km(point1, point2):
@@ -94,79 +129,13 @@ def haversine_distance_km(point1, point2):
     return geodesic((point1.y, point1.x), (point2.y, point2.x)).km
 
 
+
 def calculate_time(distance_km, speed_kmph, traffic_multiplier=1.0):
     """
-    Calculates delivery time as timedelta.
+    Calculates ETA as timedelta.
     """
-    hours = (float(distance_km) / float(speed_kmph)) * traffic_multiplier
+    hours = (distance_km / float(speed_kmph)) * traffic_multiplier
     return timedelta(hours=hours)
-
-
-def get_osrm_route(start_point, end_point):
-    print(f"OSRM route requested from {start_point} to {end_point}")
-    """
-    Get the actual road-based route between two points using OSRM.
-    
-    Args:
-        start_point: GIS Point object (driver location)
-        end_point: GIS Point object (delivery location)
-        
-    Returns:
-        dict with total_distance_km, estimated_time, and path_coords
-    """
-    try:
-        # OSRM expects coordinates as [longitude, latitude]
-        start_coords = [start_point.x, start_point.y]
-        end_coords = [end_point.x, end_point.y]
-        
-        # Call OSRM API to get the route
-        route = osrm_client.directions(
-            locations=[start_coords, end_coords],
-            profile='driving',
-            overview='full',
-            alternatives=False,
-            steps=True,
-            continue_straight=True,
-            annotations=True
-        )
-        
-        # Extract the route information
-        # The Direction object doesn't have status_code attribute
-        # Instead, check if geometry exists and has coordinates
-        if route.geometry and len(route.geometry) > 0:
-            # Get the geometry (path coordinates)
-            path_coords = []
-            for coord in route.geometry:
-                # OSRM returns [longitude, latitude], but we store as [latitude, longitude]
-                path_coords.append([coord[1], coord[0]])
-            
-            # Get the distance in kilometers
-            distance_km = route.distance / 1000.0  # Convert meters to kilometers
-            
-            # Get the duration in seconds and convert to timedelta
-            duration_seconds = route.duration
-            estimated_time = timedelta(seconds=duration_seconds)
-            
-            print(f"OSRM route found with {len(path_coords)} points")
-            
-            return {
-                'total_distance_km': round(distance_km, 2),
-                'estimated_time': estimated_time,
-                'path_coords': path_coords
-            }
-        else:
-            logger.error("OSRM API returned no geometry")
-            # Fall back to haversine distance if OSRM fails
-            return fallback_route(start_point, end_point)
-            
-    except RouterApiError as e:
-        logger.error(f"OSRM API error: {str(e)}")
-        # Fall back to haversine distance if OSRM fails
-        return fallback_route(start_point, end_point)
-    except Exception as e:
-        logger.error(f"Unexpected error in get_osrm_route: {str(e)}")
-        # Fall back to haversine distance if anything goes wrong
-        return fallback_route(start_point, end_point)
 
 
 def fallback_route(start_point, end_point, vehicle_speed_kmph=40):
@@ -190,44 +159,47 @@ def fallback_route(start_point, end_point, vehicle_speed_kmph=40):
     }
 
 
-def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph):
+def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
     """
-    Generates an optimal path using OpenStreetMap routing and returns total time and path.
-    `delivery_points` is a list of GIS Points (including end locations).
-    `start_point` is the driver's location.
+    Computes total route across multiple delivery points.
     
-    If there are multiple delivery points, we'll use a simple approach:
-    1. Get the route from start_point to the first delivery point
-    2. For each subsequent delivery point, get the route from the previous point
+    Args:
+        delivery_points (list of Point): Points to visit.
+        start_point (Point): Starting location (usually driver's location).
+        vehicle_speed_kmph (float): Speed in km/h.
+
+    Returns:
+        dict: {
+            'total_distance_km': float,
+            'estimated_time': timedelta,
+            'path_coords': list of [lat, lon]
+        }
     """
-    # If we only have one delivery point, just get the direct route
     if len(delivery_points) == 1:
-        return get_osrm_route(start_point, delivery_points[0])
-    
-    # For multiple delivery points, calculate routes between each consecutive point
+        return get_osm_route(start_point, delivery_points[0], vehicle_speed_kmph)
+
     total_distance = 0
     total_time_seconds = 0
     all_path_coords = []
-    
-    # First route: from start to first delivery point
+
     current_point = start_point
     for i, next_point in enumerate(delivery_points):
-        # Get route from current point to next point
-        route_segment = get_osrm_route(current_point, next_point)
-        
-        # Add distance and time
-        total_distance += route_segment['total_distance_km']
-        total_time_seconds += route_segment['estimated_time'].total_seconds()
-        
-        # Add path coordinates (skip the first point if not the first segment to avoid duplicates)
+        route = get_osm_route(current_point, next_point, vehicle_speed_kmph)
+
+        if not route:
+            logger.warning(f"Route failed between {current_point} and {next_point}")
+            continue
+
+        total_distance += route['total_distance_km']
+        total_time_seconds += route['estimated_time'].total_seconds()
+
         if i == 0:
-            all_path_coords.extend(route_segment['path_coords'])
+            all_path_coords.extend(route['path_coords'])
         else:
-            all_path_coords.extend(route_segment['path_coords'][1:])  # Skip the first point to avoid duplicates
-        
-        # Update current point for next iteration
+            all_path_coords.extend(route['path_coords'][1:])  # avoid duplicate point
+
         current_point = next_point
-    
+
     return {
         'total_distance_km': round(total_distance, 2),
         'estimated_time': timedelta(seconds=total_time_seconds),
