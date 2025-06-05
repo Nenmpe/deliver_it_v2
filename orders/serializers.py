@@ -51,11 +51,15 @@ class OrderSerializer(serializers.ModelSerializer):
         validated_data['driver'] = driver
 
         print("✅ Step 4: Generating path matrix")
+        # Calculate path, time, and distance using OSRM
         result = generate_path_matrix(
             delivery_points=[delivery_location],
             start_point=driver.location,
             vehicle_speed_kmph=driver.vehicle_speed
         )
+        
+        if result is None:
+            raise serializers.ValidationError("Routing failed: could not calculate estimated time.")
 
         print("✅ Step 5: Matrix result =", result)
         validated_data['estimated_time'] = result['estimated_time']
@@ -67,6 +71,14 @@ class OrderSerializer(serializers.ModelSerializer):
             line_coords = [(lon, lat) for lat, lon in path_coords]
             validated_data['path_coords'] = line_coords
             validated_data['delivery_path'] = LineString(line_coords)
+            # Debug print to check what coordinates we're getting
+            print(f"Path coordinates count: {len(path_coords)}")
+            print(f"First few coordinates: {path_coords[:3]}")
+            
+            # OSRM already returns (lon, lat) which is what LineString needs
+            # No need to swap coordinates
+            validated_data['path_coords'] = path_coords  # Save original format for API response
+            validated_data['delivery_path'] = LineString(path_coords)  # Convert for GIS
 
         print("✅ Step 6: Creating order object")
         order = Order.objects.create(**validated_data)

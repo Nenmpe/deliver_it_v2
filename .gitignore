@@ -1,1 +1,5 @@
 .env
+cache/
+graph_cache/
+__pycache__/
+*.py[cod]

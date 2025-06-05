@@ -5,6 +5,7 @@ from leaflet.admin import LeafletGeoAdmin
 
 @admin.register(Order)
 class OrderAdmin(LeafletGeoAdmin):
+    ordering = ['-created_at']
     list_display = (
         'order_id', 'supplier', 'item', 'qty', 'price', 'customer',
         'delivery_location', 'delivery_date', 'instruction', 'driver',
