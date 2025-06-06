@@ -5,6 +5,8 @@ from customer.models import Customer
 from supplier.models import Supplier
 from driver.models import Driver
 from items.models import Item
+from django.utils import timezone
+
 
 class Order(models.Model):
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -25,6 +27,7 @@ class Order(models.Model):
 
     # For map path
     delivery_path = gis_models.LineStringField(null=True, blank=True, srid=4326)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return str(self.order_id)
