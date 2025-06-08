@@ -25,6 +25,7 @@ class Order(models.Model):
 
     # For map path
     delivery_path = gis_models.LineStringField(null=True, blank=True, srid=4326)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.order_id)
