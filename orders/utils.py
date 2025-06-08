@@ -50,6 +50,7 @@ def get_osm_route(start_point, end_point, vehicle_speed_kmph=50):
         center_lat = (start_lat + end_lat) / 2
         center_lon = (start_lon + end_lon) / 2
         dist = max(abs(start_lat - end_lat), abs(start_lon - end_lon)) * 111000 * 1.5
+        dist = min(dist, 10000)
 
         G = load_or_create_graph(center_lat, center_lon, dist)
 

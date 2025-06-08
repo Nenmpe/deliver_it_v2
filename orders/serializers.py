@@ -57,6 +57,7 @@ class OrderSerializer(serializers.ModelSerializer):
             start_point=driver.location,
             vehicle_speed_kmph=driver.vehicle_speed
         )
+        print("⬅️ Returned from generate_path_matrix")
         
         if result is None:
             raise serializers.ValidationError("Routing failed: could not calculate estimated time.")
