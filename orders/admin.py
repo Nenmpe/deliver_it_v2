@@ -9,7 +9,7 @@ class OrderAdmin(LeafletGeoAdmin):
     list_display = (
         'order_id', 'supplier', 'item', 'qty', 'price', 'customer',
         'delivery_location', 'delivery_date', 'instruction', 'driver',
-        'estimated_time', 'total_distance_km', 'path_coords', 'delivery_path'  # ✅ Added
+        'estimated_time', 'total_distance_km', 'short_path_coords', 'delivery_path'  # ✅ Added
     )
     search_fields = ('supplier__company_name', 'driver__user__fullname')
     list_filter = ('order_id', 'supplier')
@@ -21,3 +21,8 @@ class OrderAdmin(LeafletGeoAdmin):
         'MIN_ZOOM': 10,
         'MAX_ZOOM': 18,
     }
+
+    def short_path_coords(self, obj):
+        if not obj.path_coords:
+            return "-"
+        return f"{len(obj.path_coords)} points: {str(obj.path_coords[:2])}..."

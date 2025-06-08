@@ -1,5 +1,12 @@
+# Ignore environment variables
 .env
+
+# Cache directories
 cache/
 graph_cache/
-__pycache__/
+
+# Ignore all __pycache__ directories recursively
+**/__pycache__/
+
+# Ignore all .pyc, .pyo, .pyd files
 *.py[cod]
