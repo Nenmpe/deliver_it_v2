@@ -2,12 +2,15 @@ from rest_framework import serializers
 from .models import Order
 from driver.models import Driver
 from django.contrib.gis.geos import Point, LineString
-from .utils import get_nearest_driver, generate_path_matrix
+from .utils import generate_path_matrix
 from items.models import Item
+from datetime import datetime
+from django.utils.timezone import now
 
 class OrderSerializer(serializers.ModelSerializer):
     latitude = serializers.FloatField(write_only=True)
     longitude = serializers.FloatField(write_only=True)
+    driver = serializers.PrimaryKeyRelatedField(queryset=Driver.objects.filter(status='available'))
 
     class Meta:
         model = Order
@@ -17,7 +20,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'latitude', 'longitude',
             'estimated_time', 'total_distance_km', 'path_coords',
         ]
-        read_only_fields = ['order_id', 'price', 'driver', 'supplier']
+        read_only_fields = ['order_id', 'price', 'supplier']
 
     def validate(self, attrs):
         item = attrs['item']
@@ -26,6 +29,11 @@ class OrderSerializer(serializers.ModelSerializer):
         # if item.supplier != supplier:
         #     raise serializers.ValidationError("Item does not belong to the supplier.")
         return attrs
+    
+    def validate_delivery_date(self, value):
+        if value <= now():
+            raise serializers.ValidationError("Delivery date must be in the future.")
+        return value
 
     def create(self, validated_data):
         print("✅ Step 1: Entering create()")
@@ -42,21 +50,22 @@ class OrderSerializer(serializers.ModelSerializer):
         qty = validated_data['qty']
         validated_data['price'] = item.price * qty
         validated_data['delivery_location'] = delivery_location
+        driver = validated_data['driver']
 
-        print("✅ Step 3: Finding nearest driver")
-        driver = get_nearest_driver(delivery_location)
-        if not driver:
-            raise serializers.ValidationError("No available driver found.")
+        print("✅ Step 3: Generating path matrix")
+        # Calculate path, time, and distance using OSM
+        # Fetch existing orders for this driver (exclude ones already delivered if needed)
+        existing_orders = Order.objects.filter(driver=driver)
+        existing_locations = [o.delivery_location for o in existing_orders]
 
-        validated_data['driver'] = driver
-
-        print("✅ Step 4: Generating path matrix")
-        # Calculate path, time, and distance using OSRM
+        # Add new one
+        delivery_points = existing_locations + [delivery_location]
         result = generate_path_matrix(
-            delivery_points=[delivery_location],
+            delivery_points=delivery_points,
             start_point=driver.location,
             vehicle_speed_kmph=driver.vehicle_speed
         )
+
         print("⬅️ Returned from generate_path_matrix")
         
         if result is None:

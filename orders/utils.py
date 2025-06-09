@@ -104,15 +104,15 @@ def get_osm_route(start_point, end_point, vehicle_speed_kmph=50):
         return None
 
 
-def get_nearest_driver(delivery_point):
-    """
-    Finds the nearest available driver to a given point.
-    """
-    drivers = Driver.objects.filter(status='available').annotate(
-        distance=Distance('location', delivery_point)
-    ).order_by('distance')
+# def get_nearest_driver(delivery_point):
+#     """
+#     Finds the nearest available driver to a given point.
+#     """
+#     drivers = Driver.objects.filter(status='available').annotate(
+#         distance=Distance('location', delivery_point)
+#     ).order_by('distance')
 
-    return drivers.first() if drivers.exists() else None
+#     return drivers.first() if drivers.exists() else None
 
 
 def get_traffic_multiplier():
@@ -162,47 +162,63 @@ def fallback_route(start_point, end_point, vehicle_speed_kmph=40):
 
 def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
     """
-    Computes total route across multiple delivery points.
-    
-    Args:
-        delivery_points (list of Point): Points to visit.
-        start_point (Point): Starting location (usually driver's location).
-        vehicle_speed_kmph (float): Speed in km/h.
-
-    Returns:
-        dict: {
-            'total_distance_km': float,
-            'estimated_time': timedelta,
-            'path_coords': list of [lat, lon]
-        }
+    Computes optimized route visiting all delivery points from start_point using Dijkstra.
     """
-    if len(delivery_points) == 1:
-        return get_osm_route(start_point, delivery_points[0], vehicle_speed_kmph)
 
+    # Step 1: Build graph from center of all points
+    all_lats = [pt.y for pt in delivery_points] + [start_point.y]
+    all_lons = [pt.x for pt in delivery_points] + [start_point.x]
+    center_lat = sum(all_lats) / len(all_lats)
+    center_lon = sum(all_lons) / len(all_lons)
+    dist = max([geodesic((lat, lon), (center_lat, center_lon)).meters for lat, lon in zip(all_lats, all_lons)]) * 2
+    dist = min(dist, 10000)
+
+    G = load_or_create_graph(center_lat, center_lon, dist)
+
+    # Step 2: Get OSM nodes
+    points = [start_point] + delivery_points
+    nodes = [ox.nearest_nodes(G, pt.x, pt.y) for pt in points]
+
+    # Step 3: Use greedy nearest-neighbor (or better: solve TSP for optimal order)
+    path_coords = []
+    visited = set()
     total_distance = 0
-    total_time_seconds = 0
-    all_path_coords = []
+    total_time = 0
 
-    current_point = start_point
-    for i, next_point in enumerate(delivery_points):
-        route = get_osm_route(current_point, next_point, vehicle_speed_kmph)
+    current_node = nodes[0]
+    visited.add(current_node)
 
-        if not route:
-            logger.warning(f"Route failed between {current_point} and {next_point}")
-            continue
+    remaining_nodes = set(nodes[1:])
+    while remaining_nodes:
+        # Find nearest unvisited node
+        next_node = min(remaining_nodes, key=lambda n: nx.shortest_path_length(G, current_node, n, weight='length'))
+        path = nx.shortest_path(G, current_node, next_node, weight='length')
+        edges = list(zip(path[:-1], path[1:]))
 
-        total_distance += route['total_distance_km']
-        total_time_seconds += route['estimated_time'].total_seconds()
+        for u, v in edges:
+            data = G.get_edge_data(u, v, 0)
+            length = data['length']
+            total_distance += length
 
-        if i == 0:
-            all_path_coords.extend(route['path_coords'])
-        else:
-            all_path_coords.extend(route['path_coords'][1:])  # avoid duplicate point
+            geometry = data.get("geometry")
+            if geometry:
+                coords = list(geometry.coords)
+            else:
+                coords = [
+                    (G.nodes[u]['x'], G.nodes[u]['y']),
+                    (G.nodes[v]['x'], G.nodes[v]['y'])
+                ]
 
-        current_point = next_point
+            for lon, lat in coords:
+                path_coords.append([lon, lat])
+
+        total_time += (length / 1000.0) / float(vehicle_speed_kmph) * 3600
+        current_node = next_node
+        visited.add(next_node)
+        remaining_nodes.remove(next_node)
 
     return {
-        'total_distance_km': round(total_distance, 2),
-        'estimated_time': timedelta(seconds=total_time_seconds),
-        'path_coords': all_path_coords
+        'total_distance_km': round(total_distance / 1000.0, 2),
+        'estimated_time': timedelta(seconds=int(total_time)),
+        'path_coords': path_coords
     }

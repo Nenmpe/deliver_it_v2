@@ -59,7 +59,7 @@ class DriverListView(APIView):
     permission_classes = [IsAuthenticated, IsSupplier]
 
     def get(self, request):
-        drivers = User.objects.filter(is_driver=True)
+        drivers = User.objects.filter(is_driver=True, driver__status='available')
         serializer = DriverListSerializer(drivers, many=True)
         return Response({
             'status': 'success',
