@@ -1,8 +1,6 @@
 import osmnx as ox
 import networkx as nx
 from django.contrib.gis.db.models.functions import Distance
-from routingpy import OSRM
-from routingpy.exceptions import RouterApiError
 from django.contrib.gis.geos import Point, LineString
 from driver.models import Driver
 from geopy.distance import geodesic
@@ -104,17 +102,6 @@ def get_osm_route(start_point, end_point, vehicle_speed_kmph=50):
         return None
 
 
-# def get_nearest_driver(delivery_point):
-#     """
-#     Finds the nearest available driver to a given point.
-#     """
-#     drivers = Driver.objects.filter(status='available').annotate(
-#         distance=Distance('location', delivery_point)
-#     ).order_by('distance')
-
-#     return drivers.first() if drivers.exists() else None
-
-
 def get_traffic_multiplier():
     """
     Returns a traffic multiplier based on current time of day.
@@ -158,6 +145,16 @@ def fallback_route(start_point, end_point, vehicle_speed_kmph=40):
         'estimated_time': estimated_time,
         'path_coords': path_coords
     }
+
+
+def remove_consecutive_duplicates(path):
+    cleaned_path = []
+    prev = None
+    for point in path:
+        if point != prev:
+            cleaned_path.append(point)
+            prev = point
+    return cleaned_path
 
 
 def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
@@ -212,6 +209,8 @@ def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
             for lon, lat in coords:
                 path_coords.append([lon, lat])
 
+        cleaned_coords = remove_consecutive_duplicates(path_coords)
+
         total_time += (length / 1000.0) / float(vehicle_speed_kmph) * 3600
         current_node = next_node
         visited.add(next_node)
@@ -220,5 +219,5 @@ def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
     return {
         'total_distance_km': round(total_distance / 1000.0, 2),
         'estimated_time': timedelta(seconds=int(total_time)),
-        'path_coords': path_coords
+        'path_coords': cleaned_coords
     }

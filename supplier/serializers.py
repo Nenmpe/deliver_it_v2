@@ -6,6 +6,7 @@ from customer.models import Customer
 from driver.models import Driver
 from django.contrib.gis.geos import Point
 from django.contrib.auth import authenticate
+from geopy.distance import geodesic
 
 class SupplierSignupSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
@@ -75,12 +76,15 @@ class DriverListSerializer(serializers.ModelSerializer):
     vehicle_speed = serializers.DecimalField(source='driver.vehicle_speed', max_digits=5, decimal_places=2)
     location = serializers.SerializerMethodField()
     status = serializers.CharField(source='driver.status')
+    distance_km = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['uid', 'email', 'fullname', 'contact_no', 'address', 
-                 'vehicle_type', 'driving_license_no', 'vehicle_speed', 
-                 'location', 'status']
+        fields = [
+            'uid', 'email', 'fullname', 'contact_no', 'address', 
+            'vehicle_type', 'driving_license_no', 'vehicle_speed', 
+            'location', 'status', 'distance_km'
+        ]
 
     def get_location(self, obj):
         if obj.driver.location:
@@ -88,4 +92,15 @@ class DriverListSerializer(serializers.ModelSerializer):
                 'type': 'Point',
                 'coordinates': [obj.driver.location.x, obj.driver.location.y]
             }
+        return None
+
+    def get_distance_km(self, obj):
+        driver_loc = obj.driver.location
+        supplier = self.context['request'].user.supplier
+        supplier_loc = supplier.company_location if supplier else None
+
+        if driver_loc and supplier_loc:
+            driver_coords = (driver_loc.y, driver_loc.x)
+            supplier_coords = (supplier_loc.y, supplier_loc.x)
+            return round(geodesic(driver_coords, supplier_coords).km, 2)
         return None

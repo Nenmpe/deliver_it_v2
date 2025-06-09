@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order
+from .models import Order, Delivery
 from leaflet.admin import LeafletGeoAdmin
 
 
@@ -7,9 +7,8 @@ from leaflet.admin import LeafletGeoAdmin
 class OrderAdmin(LeafletGeoAdmin):
     ordering = ['-created_at']
     list_display = (
-        'order_id', 'supplier', 'item', 'qty', 'price', 'customer',
-        'delivery_location', 'delivery_date', 'instruction', 'driver',
-        'estimated_time', 'total_distance_km', 'combined_order_count'  # ✅ Added
+        'order_id', 'supplier', 'delivery_date', 'driver',
+        'estimated_time', 'total_distance_km',
     )
     search_fields = ('supplier__company_name', 'driver__user__fullname')
     # list_filter = ('supplier', )
@@ -22,7 +21,14 @@ class OrderAdmin(LeafletGeoAdmin):
         'MAX_ZOOM': 18,
     }
 
-    def combined_order_count(self, obj):
-        return Order.objects.filter(driver=obj.driver).count()
-    combined_order_count.short_description = 'Deliveries by driver'
 
+@admin.register(Delivery)
+class DeliveryAdmin(LeafletGeoAdmin):
+    list_display = ('order', 'customer', 'item', 'qty', 'total_price', 'delivery_location')
+
+    list_filter = ('order',)
+
+    def total_price(self, obj):
+        return obj.price
+    
+    total_price.short_description = 'Total Price'

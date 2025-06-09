@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order
+from .models import Order, Delivery
 from driver.models import Driver
 from django.contrib.gis.geos import Point, LineString
 from .utils import generate_path_matrix
@@ -7,90 +7,92 @@ from items.models import Item
 from datetime import datetime
 from django.utils.timezone import now
 
-class OrderSerializer(serializers.ModelSerializer):
-    latitude = serializers.FloatField(write_only=True)
-    longitude = serializers.FloatField(write_only=True)
+# serializers.py
+class DeliveryInputSerializer(serializers.Serializer):
+    customer = serializers.UUIDField()
+    item = serializers.UUIDField()
+    qty = serializers.IntegerField()
+    instruction = serializers.CharField(required=False, allow_blank=True)
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+class BatchedOrderSerializer(serializers.Serializer):
     driver = serializers.PrimaryKeyRelatedField(queryset=Driver.objects.filter(status='available'))
+    delivery_date = serializers.DateTimeField()
+    orders = DeliveryInputSerializer(many=True)
 
-    class Meta:
-        model = Order
-        fields = [
-            'order_id', 'supplier', 'item', 'qty', 'price', 'customer',
-            'delivery_date', 'instruction', 'driver',
-            'latitude', 'longitude',
-            'estimated_time', 'total_distance_km', 'path_coords',
-        ]
-        read_only_fields = ['order_id', 'price', 'supplier']
-
-    def validate(self, attrs):
-        item = attrs['item']
-        # Optional: Enforce that item.supplier matches request.user.supplier
-        # supplier = attrs['supplier']
-        # if item.supplier != supplier:
-        #     raise serializers.ValidationError("Item does not belong to the supplier.")
-        return attrs
-    
     def validate_delivery_date(self, value):
         if value <= now():
             raise serializers.ValidationError("Delivery date must be in the future.")
         return value
 
     def create(self, validated_data):
-        print("✅ Step 1: Entering create()")
-        lat = validated_data.pop('latitude', None)
-        lon = validated_data.pop('longitude', None)
-
-        if lat is None or lon is None:
-            raise serializers.ValidationError("Latitude and Longitude are required.")
-
-        print("✅ Step 2: Creating Point")
-        delivery_location = Point(float(lon), float(lat), srid=4326)
-
-        item = validated_data['item']
-        qty = validated_data['qty']
-        validated_data['price'] = item.price * qty
-        validated_data['delivery_location'] = delivery_location
         driver = validated_data['driver']
+        delivery_date = validated_data['delivery_date']
+        deliveries_data = validated_data['orders']
 
-        print("✅ Step 3: Generating path matrix")
-        # Calculate path, time, and distance using OSM
-        # Fetch existing orders for this driver (exclude ones already delivered if needed)
-        existing_orders = Order.objects.filter(driver=driver)
-        existing_locations = [o.delivery_location for o in existing_orders]
+        # Check if existing order exists
+        order, created = Order.objects.get_or_create(
+            driver=driver,
+            delivery_date=delivery_date,
+            defaults={'supplier': self.context['request'].user.supplier}
+        )
 
-        # Add new one
-        delivery_points = existing_locations + [delivery_location]
+        # Gather delivery locations
+        delivery_points = []
+        for delivery in deliveries_data:
+            point = Point(delivery['longitude'], delivery['latitude'], srid=4326)
+            delivery_points.append(point)
+
+        # All delivery locations (existing + new)
+        existing_points = list(order.deliveries.all().values_list('delivery_location', flat=True))
+        all_points = existing_points + delivery_points
+
+        # Generate path
         result = generate_path_matrix(
-            delivery_points=delivery_points,
+            delivery_points=all_points,
             start_point=driver.location,
             vehicle_speed_kmph=driver.vehicle_speed
         )
 
-        print("⬅️ Returned from generate_path_matrix")
-        
         if result is None:
-            raise serializers.ValidationError("Routing failed: could not calculate estimated time.")
+            raise serializers.ValidationError("Could not generate route.")
+        
+        print("Path Coords:", result['path_coords'])
+        print("LineString:", [(lon, lat) for lat, lon in result['path_coords']])
 
-        print("✅ Step 5: Matrix result =", result)
-        validated_data['estimated_time'] = result['estimated_time']
-        validated_data['total_distance_km'] = result['total_distance_km']
-        validated_data['path_coords'] = result['path_coords']
+        order.estimated_time = result['estimated_time']
+        order.total_distance_km = result['total_distance_km']
+        order.path_coords = result['path_coords']
+        # order.delivery_path = LineString([(lon, lat) for lat, lon in result['path_coords']])
+        order.delivery_path = LineString(result['path_coords'])
+        order.save()
 
-        path_coords = result['path_coords']
-        if path_coords:
-            line_coords = [(lon, lat) for lat, lon in path_coords]
-            validated_data['path_coords'] = line_coords
-            validated_data['delivery_path'] = LineString(line_coords)
-            # Debug print to check what coordinates we're getting
-            print(f"Path coordinates count: {len(path_coords)}")
-            print(f"First few coordinates: {path_coords[:3]}")
-            
-            # OSRM already returns (lon, lat) which is what LineString needs
-            # No need to swap coordinates
-            validated_data['path_coords'] = path_coords  # Save original format for API response
-            validated_data['delivery_path'] = LineString(path_coords)  # Convert for GIS
+        # Save each delivery
 
-        print("✅ Step 6: Creating order object")
-        order = Order.objects.create(**validated_data)
-        print("✅ Step 7: Order created:", order)
+        # First, fetch all needed items in one query
+        item_ids = [delivery['item'] for delivery in deliveries_data]
+        items_map = {item.uid: item for item in Item.objects.filter(uid__in=item_ids)}
+
+        # Prepare the delivery instances
+        deliveries = []
+        for delivery_data in deliveries_data:
+            item = items_map[delivery_data['item']]
+            price = item.price * delivery_data['qty']
+            point = Point(delivery_data['longitude'], delivery_data['latitude'], srid=4326)
+
+            deliveries.append(Delivery(
+                order=order,
+                item=item,
+                qty=delivery_data['qty'],
+                price=price,
+                customer_id=delivery_data['customer'],
+                instruction=delivery_data.get('instruction', ''),
+                delivery_location=point
+            ))
+
+        # Bulk create all deliveries in one query
+        Delivery.objects.bulk_create(deliveries)
+
         return order
+

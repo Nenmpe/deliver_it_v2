@@ -60,7 +60,7 @@ class DriverListView(APIView):
 
     def get(self, request):
         drivers = User.objects.filter(is_driver=True, driver__status='available')
-        serializer = DriverListSerializer(drivers, many=True)
+        serializer = DriverListSerializer(drivers, many=True, context={'request': request})
         return Response({
             'status': 'success',
             'message': 'Drivers retrieved successfully',
