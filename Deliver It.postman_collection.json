@@ -1,0 +1,635 @@
+{
+	"info": {
+		"_postman_id": "3182c0cb-97c5-4e85-a0e1-7140ab1b7927",
+		"name": "Deliver It",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37275021"
+	},
+	"item": [
+		{
+			"name": "supplier",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mike@supplier.com\",\r\n    \"password\": \"secure_password123\",\r\n    \"password2\": \"secure_password123\",\r\n    \"fullname\": \"John Supp\",\r\n    \"contact_no\": \"+1234567890\",\r\n    \"address\": \"123 Main St, City\",\r\n    \"latitude\": 71.5,\r\n    \"longitude\": 43.3,\r\n    \"company_name\": \"BCA Company ltd\",\r\n    \"pan_no\": \"8554629473547\",\r\n    \"is_supplier\": true, \r\n    \"terms_accepted\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/supplier/signup/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"supplier",
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Log In",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"john@supplier.com\",\r\n    \"password\": \"secure_password123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/supplier/signin/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"supplier",
+								"signin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg4MDQ4LCJpYXQiOjE3NDg3ODQ0NDgsImp0aSI6IjM4NmQ2NmY4YzVkNzQxYmU4NmRiMjQzZmE3MTQ2M2NlIiwidXNlcl9pZCI6Mn0.8WLiwcRW5gXkanVJmKH1ne6eegVDbtqrELNXkFiqyz4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/supplier/customers/",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"supplier",
+								"customers",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list drivers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg5NzAzLCJpYXQiOjE3NDg3ODYxMDMsImp0aSI6IjJhOGM2NDE2MWFiNzQ0ODQ4NzBjNjUwYWZkMWY5OGEzIiwidXNlcl9pZCI6Mn0.-WTXq-Ifa8wRzOhxlW2X5DhaG2KWKezsXBX7Cf9hPxY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/supplier/drivers/",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"supplier",
+								"drivers",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "customer",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"secure_password34758\",\r\n    \"password2\": \"secure_password34758\",\r\n    \"fullname\": \"John Cust\",\r\n    \"contact_no\": \"+1234567890\",\r\n    \"address\": \"123 Main St, City\",\r\n    \"country\": \"Nepal\",\r\n    \"state\": \"Kavre\",\r\n    \"city\": \"Banepa\",\r\n    \"postal_code\": \"12334\",\r\n    \"is_customer\": true, \r\n    \"terms_accepted\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/customer/signup/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"customer",
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Log In",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"NewSecurePass123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/customer/signin/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"customer",
+								"signin",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "driver",
+			"item": [
+				{
+					"name": "log in",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/driver/signin/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"driver",
+								"signin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"jon@driver.com\",\r\n    \"password\": \"secure_password123\",\r\n    \"password2\": \"secure_password123\",\r\n    \"fullname\": \"John Drive\",\r\n    \"contact_no\": \"+1234567890\",\r\n    \"address\": \"123 Main St, City\",\r\n    \"driving_license_no\": \"27687287562\",\r\n    \"vehicle_type\": \"two-wheel\",\r\n    \"number_plate_no\": \"Ba 2 kha 234\",\r\n    \"vehicle_speed\": \"30\",\r\n    \"status\": \"available\",\r\n    \"latitude\": 75.5,\r\n    \"longitude\": 30.3,\r\n    \"is_driver\": true, \r\n    \"terms_accepted\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/driver/signup/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"driver",
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order creation",
+			"item": [
+				{
+					"name": "create order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NDY3NjM2LCJpYXQiOjE3NDk0NjQwMzYsImp0aSI6IjZhM2ZjYjVhNmIxNjQwNTM5ZmUyZGUzM2Q5MWJiMzcyIiwidXNlcl9pZCI6Mn0.Nu332npAGSs8Q5MEPAwKmYLlkBkgxdQQ6kQojb5k9t0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\r\n//   \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\r\n//   \"longitude\": 85.270901,\r\n//   \"latitude\": 27.694928,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n\r\n// {\r\n//   \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n//   \"longitude\": 85.269527,\r\n//   \"latitude\": 27.717117,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n\r\n// {\r\n//   \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n//   \"longitude\": 85.313516,\r\n//   \"latitude\": 27.714249,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n\r\n\r\n//85.270901 27.694928\r\n//85.269527 27.717117\r\n//85.313516 27.714249",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/delivery/orders/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"delivery",
+								"orders",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "password reset",
+			"item": [
+				{
+					"name": "1 otp request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/account/request-otp/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"account",
+								"request-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. verify otp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"otp\": \"218330\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/account/verify-otp/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"account",
+								"verify-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3 create new password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"otp\": \"218330\",\r\n    \"new_password\": \"secure_password123\",\r\n    \"new_password_confirm\": \"secure_password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/account/reset-password/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"account",
+								"reset-password",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "items",
+			"item": [
+				{
+					"name": "list items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg4MDQ4LCJpYXQiOjE3NDg3ODQ0NDgsImp0aSI6IjM4NmQ2NmY4YzVkNzQxYmU4NmRiMjQzZmE3MTQ2M2NlIiwidXNlcl9pZCI6Mn0.8WLiwcRW5gXkanVJmKH1ne6eegVDbtqrELNXkFiqyz4",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/api/inventory/items",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"inventory",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg4MDQ4LCJpYXQiOjE3NDg3ODQ0NDgsImp0aSI6IjM4NmQ2NmY4YzVkNzQxYmU4NmRiMjQzZmE3MTQ2M2NlIiwidXNlcl9pZCI6Mn0.8WLiwcRW5gXkanVJmKH1ne6eegVDbtqrELNXkFiqyz4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"mobile\", \"description\": \"desc of mobile\", \"price\": 1000, \"quantity\": 10, \"supplier\": 2}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/inventory/items/",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"inventory",
+								"items",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg4MDQ4LCJpYXQiOjE3NDg3ODQ0NDgsImp0aSI6IjM4NmQ2NmY4YzVkNzQxYmU4NmRiMjQzZmE3MTQ2M2NlIiwidXNlcl9pZCI6Mn0.8WLiwcRW5gXkanVJmKH1ne6eegVDbtqrELNXkFiqyz4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"mobile\", \"description\": \"desc of mobile\", \"price\": 1000, \"quantity\": 10, \"supplier\": 2}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/inventory/items/78ac9a0-160c-4356-a006-b4abd193b646/",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"inventory",
+								"items",
+								"78ac9a0-160c-4356-a006-b4abd193b646",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4Nzg5NzAzLCJpYXQiOjE3NDg3ODYxMDMsImp0aSI6IjJhOGM2NDE2MWFiNzQ0ODQ4NzBjNjUwYWZkMWY5OGEzIiwidXNlcl9pZCI6Mn0.-WTXq-Ifa8wRzOhxlW2X5DhaG2KWKezsXBX7Cf9hPxY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/api/inventory/items/da62fe4c-04f8-4dbf-b8ca-61cdc73bd234/",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"api",
+								"inventory",
+								"items",
+								"da62fe4c-04f8-4dbf-b8ca-61cdc73bd234",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Log out",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2OTA0NzU0LCJpYXQiOjE3NDY5MDExNTQsImp0aSI6IjhjZGJjNTM0YWY5YzQ0OTY5NmJiMTYwMDBmYjViZmRmIiwidXNlcl9pZCI6MX0.UMRqrTzRYNSCPsDraOcEWqUWxmGzMAn9jhFdr84-PEU",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0Njk4NzU1NCwiaWF0IjoxNzQ2OTAxMTU0LCJqdGkiOiI3MzhjNzhkNDFlY2Y0MGE0YWYyODU5ZDE1M2U2NDkxNSIsInVzZXJfaWQiOjF9.z9BUZBxb9fQ7iUXm7wrM2p_ZNleRBb-SyUnmQoYapTY\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/users/logout/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"logout",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"current_password\": \"OldPass123\",\r\n  \"new_password\": \"NewSecurePass123\",\r\n  \"new_password_confirm\": \"NewSecurePass123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/account/change-password/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"account",
+						"change-password",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
