@@ -64,7 +64,6 @@ class BatchedOrderSerializer(serializers.Serializer):
         order.estimated_time = result['estimated_time']
         order.total_distance_km = result['total_distance_km']
         order.path_coords = result['path_coords']
-        # order.delivery_path = LineString([(lon, lat) for lat, lon in result['path_coords']])
         order.delivery_path = LineString(result['path_coords'])
         order.save()
 
@@ -95,4 +94,20 @@ class BatchedOrderSerializer(serializers.Serializer):
         Delivery.objects.bulk_create(deliveries)
 
         return order
+
+class DeliverySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Delivery
+        fields = ['id', 'item', 'qty', 'price', 'customer', 'delivery_location', 'instruction']
+
+class OrderListSerializer(serializers.ModelSerializer):
+    deliveries = DeliverySerializer(many=True, read_only=True)
+    driver_name = serializers.CharField(source='driver.user.fullname', read_only=True)
+    supplier_name = serializers.CharField(source='supplier.user.fullname', read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['order_id', 'supplier', 'supplier_name', 'driver', 'driver_name', 
+                 'delivery_date', 'estimated_time', 'total_distance_km', 
+                 'path_coords', 'delivery_path', 'created_at', 'deliveries']
 

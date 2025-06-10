@@ -4,14 +4,18 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Order
-from .serializers import BatchedOrderSerializer
+from .serializers import BatchedOrderSerializer, OrderListSerializer
 from users.permissions import IsSupplier
 
 
 class OrderViewSet(ModelViewSet):
-    serializer_class = BatchedOrderSerializer
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated, IsSupplier]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return BatchedOrderSerializer
+        return OrderListSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -26,7 +30,7 @@ class OrderViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
 
-        # You don’t need to validate `item.supplier` here because each item is handled in the serializer
+        # You don't need to validate `item.supplier` here because each item is handled in the serializer
         order = serializer.save()  # supplier is set via `get_or_create()` inside serializer
 
         return Response({
@@ -38,3 +42,21 @@ class OrderViewSet(ModelViewSet):
             'path_coords': order.path_coords,
             'delivery_count': order.deliveries.count(),
         }, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'status': 'success',
+            'message': 'Orders retrieved successfully',
+            'data': serializer.data
+        })
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            'status': 'success',
+            'message': 'Order retrieved successfully',
+            'data': serializer.data
+        })
