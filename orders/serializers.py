@@ -104,10 +104,20 @@ class OrderListSerializer(serializers.ModelSerializer):
     deliveries = DeliverySerializer(many=True, read_only=True)
     driver_name = serializers.CharField(source='driver.user.fullname', read_only=True)
     supplier_name = serializers.CharField(source='supplier.user.fullname', read_only=True)
+    path_coords = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = ['order_id', 'supplier', 'supplier_name', 'driver', 'driver_name', 
                  'delivery_date', 'estimated_time', 'total_distance_km', 
-                 'path_coords', 'delivery_path', 'created_at', 'deliveries']
+                 'path_coords', 'created_at', 'deliveries']
+        
+    def get_path_coords(self, obj):
+        coords = obj.path_coords or []
+        try:
+            return [[lat, lon] for lon, lat in coords]
+        except (TypeError, ValueError):
+            return []
+        
+
 
