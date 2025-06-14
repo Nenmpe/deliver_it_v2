@@ -31,11 +31,11 @@ class BatchedOrderSerializer(serializers.Serializer):
         delivery_date = validated_data['delivery_date']
         deliveries_data = validated_data['orders']
 
-        # Check if existing order exists
-        order, created = Order.objects.get_or_create(
+        # Create new order
+        order = Order.objects.create(
             driver=driver,
             delivery_date=delivery_date,
-            defaults={'supplier': self.context['request'].user.supplier}
+            supplier=self.context['request'].user.supplier
         )
 
         # Gather delivery locations
@@ -44,13 +44,9 @@ class BatchedOrderSerializer(serializers.Serializer):
             point = Point(delivery['longitude'], delivery['latitude'], srid=4326)
             delivery_points.append(point)
 
-        # All delivery locations (existing + new)
-        existing_points = list(order.deliveries.all().values_list('delivery_location', flat=True))
-        all_points = existing_points + delivery_points
-
         # Generate path
         result = generate_path_matrix(
-            delivery_points=all_points,
+            delivery_points=delivery_points,
             start_point=driver.location,
             vehicle_speed_kmph=driver.vehicle_speed
         )
@@ -96,9 +92,20 @@ class BatchedOrderSerializer(serializers.Serializer):
         return order
 
 class DeliverySerializer(serializers.ModelSerializer):
+    item_name = serializers.CharField(source='item.name', read_only=True)
+    customer_name = serializers.CharField(source='customer.user.fullname', read_only=True)
+
     class Meta:
         model = Delivery
-        fields = ['id', 'item', 'qty', 'price', 'customer', 'delivery_location', 'instruction']
+        fields = ['id', 'item', 'item_name', 'qty', 'price', 'customer', 'customer_name', 'delivery_location', 'instruction']
+
+class CustomerDeliverySerializer(serializers.ModelSerializer):
+    item_name = serializers.CharField(source='item.name', read_only=True)
+    customer_name = serializers.CharField(source='customer.user.fullname', read_only=True)
+
+    class Meta:
+        model = Delivery
+        fields = ['id', 'item', 'item_name', 'qty', 'price', 'customer', 'customer_name', 'delivery_location', 'instruction']
 
 class OrderListSerializer(serializers.ModelSerializer):
     deliveries = DeliverySerializer(many=True, read_only=True)
@@ -110,7 +117,7 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['order_id', 'supplier', 'supplier_name', 'driver', 'driver_name', 
                  'delivery_date', 'estimated_time', 'total_distance_km', 
-                 'path_coords', 'created_at', 'deliveries']
+                 'path_coords', 'status', 'created_at', 'deliveries']
         
     def get_path_coords(self, obj):
         coords = obj.path_coords or []
@@ -118,6 +125,21 @@ class OrderListSerializer(serializers.ModelSerializer):
             return [[lat, lon] for lon, lat in coords]
         except (TypeError, ValueError):
             return []
-        
+
+class CustomerOrderSerializer(serializers.ModelSerializer):
+    deliveries = serializers.SerializerMethodField()
+    driver_name = serializers.CharField(source='driver.user.fullname', read_only=True)
+    supplier_name = serializers.CharField(source='supplier.user.fullname', read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['order_id', 'supplier', 'supplier_name', 'driver', 'driver_name', 
+                 'delivery_date', 'deliveries']
+
+    def get_deliveries(self, obj):
+        # Get only deliveries for the current customer
+        user = self.context['request'].user
+        customer_deliveries = obj.deliveries.filter(customer__user=user)
+        return CustomerDeliverySerializer(customer_deliveries, many=True).data
 
 

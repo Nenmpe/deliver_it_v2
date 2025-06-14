@@ -1,26 +1,44 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Order
-from .serializers import BatchedOrderSerializer, OrderListSerializer
-from users.permissions import IsSupplier
+from .serializers import BatchedOrderSerializer, OrderListSerializer, CustomerOrderSerializer
+from users.permissions import IsSupplier, IsDriver
+from .utils import send_order_notification
+
+
+class IsSupplierOrDriverOrCustomer(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and 
+                   (request.user.is_supplier or request.user.is_driver or request.user.is_customer))
 
 
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
-    permission_classes = [IsAuthenticated, IsSupplier]
+    permission_classes = [IsAuthenticated, IsSupplierOrDriverOrCustomer]
 
     def get_serializer_class(self):
         if self.action == 'create':
             return BatchedOrderSerializer
+        elif self.request.user.is_customer:
+            return CustomerOrderSerializer
         return OrderListSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
     def get_queryset(self):
         user = self.request.user
-        if hasattr(user, 'supplier'):
+        if user.is_supplier:
             return Order.objects.filter(supplier__user=user)
+        elif user.is_driver:
+            return Order.objects.filter(driver__user=user)
+        elif user.is_customer:
+            return Order.objects.filter(deliveries__customer__user=user).distinct()
         return Order.objects.none()
 
     def create(self, request, *args, **kwargs):
@@ -32,6 +50,39 @@ class OrderViewSet(ModelViewSet):
 
         # You don't need to validate `item.supplier` here because each item is handled in the serializer
         order = serializer.save()  # supplier is set via `get_or_create()` inside serializer
+
+        # Get all users to notify
+        users_to_notify = []
+        
+        # Add driver
+        if order.driver:
+            users_to_notify.append(order.driver.user)
+        
+        # Add customers
+        customer_users = [delivery.customer.user for delivery in order.deliveries.all()]
+        users_to_notify.extend(customer_users)
+
+        # Prepare notification data
+        title = "New Order Created"
+        body = f"New order {order.order_id} has been created by {supplier.company_name}. "
+        body += f"Delivery is scheduled for {order.delivery_date}."
+        
+        # Additional data to send with notification
+        data = {
+            'order_id': str(order.order_id),
+            'type': 'order_created',
+            'delivery_date': order.delivery_date.isoformat(),
+            'supplier_name': supplier.company_name
+        }
+        
+        send_order_notification(
+            order=order,
+            notification_type='order_created',
+            users=users_to_notify,
+            title=title,
+            body=body,
+            data=data
+        )
 
         return Response({
             'order_id': str(order.order_id),
