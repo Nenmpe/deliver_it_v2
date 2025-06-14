@@ -6,6 +6,10 @@ from users.serializers import CustomTokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsCustomer
+from .serializers import SupplierWithItemsSerializer
+from supplier.models import Supplier
+from django.db.models import Prefetch
+from items.models import Item
 
 class CustomerSignupView(APIView):
     def post(self, request):
@@ -38,4 +42,16 @@ class CustomerDashboardView(APIView):
     def get(self, request):
         return Response({
             "message": f"Welcome Customer {request.user.fullname}"
+        })
+
+class SupplierListView(APIView):
+    permission_classes = [IsAuthenticated, IsCustomer]
+
+    def get(self, request):
+        suppliers = Supplier.objects.prefetch_related('item_set').all()
+        serializer = SupplierWithItemsSerializer(suppliers, many=True)
+        return Response({
+            'status': 'success',
+            'message': 'Suppliers retrieved successfully',
+            'data': serializer.data
         })
