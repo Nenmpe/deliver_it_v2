@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     fullname = models.CharField(max_length=255)
-    contact_no = models.CharField(max_length=20)
+    contact_no = models.CharField(max_length=20, unique=True)
     address = models.TextField()
     is_customer = models.BooleanField(default=False)
     is_driver = models.BooleanField(default=False)

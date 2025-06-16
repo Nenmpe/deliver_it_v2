@@ -22,7 +22,7 @@ class BatchedOrderSerializer(serializers.Serializer):
     orders = DeliveryInputSerializer(many=True)
 
     def validate_delivery_date(self, value):
-        if value <= now():
+        if value < now():
             raise serializers.ValidationError("Delivery date must be in the future.")
         return value
 
@@ -30,12 +30,13 @@ class BatchedOrderSerializer(serializers.Serializer):
         driver = validated_data['driver']
         delivery_date = validated_data['delivery_date']
         deliveries_data = validated_data['orders']
+        supplier = self.context['request'].user.supplier
 
         # Create new order
         order = Order.objects.create(
             driver=driver,
             delivery_date=delivery_date,
-            supplier=self.context['request'].user.supplier
+            supplier=supplier
         )
 
         # Gather delivery locations
@@ -48,7 +49,8 @@ class BatchedOrderSerializer(serializers.Serializer):
         result = generate_path_matrix(
             delivery_points=delivery_points,
             start_point=driver.location,
-            vehicle_speed_kmph=driver.vehicle_speed
+            vehicle_speed_kmph=driver.vehicle_speed,
+            supplier_point=supplier.company_location
         )
 
         if result is None:
@@ -64,30 +66,22 @@ class BatchedOrderSerializer(serializers.Serializer):
         order.save()
 
         # Save each delivery
-
         # First, fetch all needed items in one query
         item_ids = [delivery['item'] for delivery in deliveries_data]
-        items_map = {item.uid: item for item in Item.objects.filter(uid__in=item_ids)}
+        items = {str(item.uid): item for item in Item.objects.filter(uid__in=item_ids)}
 
-        # Prepare the delivery instances
-        deliveries = []
+        # Create all deliveries
         for delivery_data in deliveries_data:
-            item = items_map[delivery_data['item']]
-            price = item.price * delivery_data['qty']
-            point = Point(delivery_data['longitude'], delivery_data['latitude'], srid=4326)
-
-            deliveries.append(Delivery(
+            item = items[str(delivery_data['item'])]
+            Delivery.objects.create(
                 order=order,
                 item=item,
                 qty=delivery_data['qty'],
-                price=price,
+                price=item.price * delivery_data['qty'],
                 customer_id=delivery_data['customer'],
-                instruction=delivery_data.get('instruction', ''),
-                delivery_location=point
-            ))
-
-        # Bulk create all deliveries in one query
-        Delivery.objects.bulk_create(deliveries)
+                delivery_location=Point(delivery_data['longitude'], delivery_data['latitude'], srid=4326),
+                instruction=delivery_data.get('instruction', '')
+            )
 
         return order
 
@@ -111,11 +105,12 @@ class OrderListSerializer(serializers.ModelSerializer):
     deliveries = DeliverySerializer(many=True, read_only=True)
     driver_name = serializers.CharField(source='driver.user.fullname', read_only=True)
     supplier_name = serializers.CharField(source='supplier.user.fullname', read_only=True)
+    supplier_location = serializers.SerializerMethodField()
     path_coords = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['order_id', 'supplier', 'supplier_name', 'driver', 'driver_name', 
+        fields = ['order_id', 'supplier', 'supplier_name', 'supplier_location', 'driver', 'driver_name', 
                  'delivery_date', 'estimated_time', 'total_distance_km', 
                  'path_coords', 'status', 'created_at', 'deliveries']
         
@@ -125,6 +120,14 @@ class OrderListSerializer(serializers.ModelSerializer):
             return [[lat, lon] for lon, lat in coords]
         except (TypeError, ValueError):
             return []
+
+    def get_supplier_location(self, obj):
+        if obj.supplier.company_location:
+            return {
+                'latitude': obj.supplier.company_location.y,
+                'longitude': obj.supplier.company_location.x
+            }
+        return None
 
 class CustomerOrderSerializer(serializers.ModelSerializer):
     deliveries = serializers.SerializerMethodField()
@@ -141,5 +144,34 @@ class CustomerOrderSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         customer_deliveries = obj.deliveries.filter(customer__user=user)
         return CustomerDeliverySerializer(customer_deliveries, many=True).data
+
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status']
+        extra_kwargs = {
+            'status': {'choices': Order.status_choices}
+        }
+
+    def validate_status(self, value):
+        order = self.instance
+        current_status = order.status
+        
+        # Define valid status transitions
+        valid_transitions = {
+            'pending': ['picked_up', 'cancelled'],
+            'picked_up': ['in_progress', 'cancelled'],
+            'in_progress': ['completed', 'cancelled'],
+            'completed': [],  # No transitions from completed
+            'cancelled': []   # No transitions from cancelled
+        }
+        
+        if value not in valid_transitions.get(current_status, []):
+            raise serializers.ValidationError(
+                f"Cannot change status from {current_status} to {value}. "
+                f"Valid transitions from {current_status} are: {valid_transitions[current_status]}"
+            )
+        
+        return value
 
 

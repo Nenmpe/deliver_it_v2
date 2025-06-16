@@ -15,7 +15,6 @@ class SupplierSignupSerializer(serializers.ModelSerializer):
     latitude = serializers.FloatField(write_only=True, required=False)
     longitude = serializers.FloatField(write_only=True, required=False)
 
-
     class Meta:
         model = User
         fields = ['email', 'password', 'password2', 'fullname', 'contact_no', 'address', 'is_supplier', 'terms_accepted',
@@ -33,11 +32,23 @@ class SupplierSignupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid user type for supplier signup.")
         return attrs
 
+    def validate_company_name(self, value):
+        if Supplier.objects.filter(company_name=value).exists():
+            raise serializers.ValidationError("A supplier with this company name already exists.")
+        return value
+
+    def validate_pan_no(self, value):
+        if Supplier.objects.filter(pan_no=value).exists():
+            raise serializers.ValidationError("A supplier with this PAN number already exists.")
+        return value
+
     def create(self, validated_data):
         company_name = validated_data.pop('company_name')
         pan_no = validated_data.pop('pan_no')
         lat = validated_data.pop('latitude', None)
         lon = validated_data.pop('longitude', None)
+
+        print("Latitude:", lat, "Longitude:", lon)
 
         if lat and lon:
             location = Point(lon, lat)

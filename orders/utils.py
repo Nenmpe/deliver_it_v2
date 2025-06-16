@@ -161,14 +161,18 @@ def remove_consecutive_duplicates(path):
     return cleaned_path
 
 
-def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
+def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50, supplier_point=None):
     """
     Computes optimized route visiting all delivery points from start_point using Dijkstra.
+    The path will go: driver -> supplier -> delivery points
     """
 
     # Step 1: Build graph from center of all points
     all_lats = [pt.y for pt in delivery_points] + [start_point.y]
     all_lons = [pt.x for pt in delivery_points] + [start_point.x]
+    if supplier_point:
+        all_lats.append(supplier_point.y)
+        all_lons.append(supplier_point.x)
     center_lat = sum(all_lats) / len(all_lats)
     center_lon = sum(all_lons) / len(all_lons)
     dist = max([geodesic((lat, lon), (center_lat, center_lon)).meters for lat, lon in zip(all_lats, all_lons)]) * 2
@@ -177,7 +181,10 @@ def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
     G = load_or_create_graph(center_lat, center_lon, dist)
 
     # Step 2: Get OSM nodes
-    points = [start_point] + delivery_points
+    points = [start_point]  # Start with driver location
+    if supplier_point:
+        points.append(supplier_point)  # Add supplier location as second point
+    points.extend(delivery_points)  # Add all delivery points
     nodes = [ox.nearest_nodes(G, pt.x, pt.y) for pt in points]
 
     # Step 3: Use greedy nearest-neighbor (or better: solve TSP for optimal order)
@@ -186,10 +193,37 @@ def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50):
     total_distance = 0
     total_time = 0
 
-    current_node = nodes[0]
+    current_node = nodes[0]  # Start from driver location
     visited.add(current_node)
 
-    remaining_nodes = set(nodes[1:])
+    # If we have a supplier point, visit it next
+    if supplier_point:
+        next_node = nodes[1]  # Supplier node
+        path = nx.shortest_path(G, current_node, next_node, weight='length')
+        edges = list(zip(path[:-1], path[1:]))
+
+        for u, v in edges:
+            data = G.get_edge_data(u, v, 0)
+            length = data['length']
+            total_distance += length
+
+            geometry = data.get("geometry")
+            if geometry:
+                coords = list(geometry.coords)
+            else:
+                coords = [
+                    (G.nodes[u]['x'], G.nodes[u]['y']),
+                    (G.nodes[v]['x'], G.nodes[v]['y'])
+                ]
+
+            for lon, lat in coords:
+                path_coords.append([lon, lat])
+
+        current_node = next_node
+        visited.add(next_node)
+
+    # Now visit remaining delivery points
+    remaining_nodes = set(nodes[2:] if supplier_point else nodes[1:])
     while remaining_nodes:
         # Find nearest unvisited node
         next_node = min(remaining_nodes, key=lambda n: nx.shortest_path_length(G, current_node, n, weight='length'))

@@ -4,6 +4,7 @@ from users.models import User
 from supplier.models import Supplier
 from customer.models import Customer
 from driver.models import Driver
+from django.db import IntegrityError
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -74,3 +75,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         
         return data
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'fullname', 'contact_no', 'address', 'is_customer', 'is_driver', 'is_supplier']
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return value
+
+    def validate_contact_no(self, value):
+        if User.objects.filter(contact_no=value).exists():
+            raise serializers.ValidationError("This contact number is already registered.")
+        return value

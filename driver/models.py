@@ -17,9 +17,9 @@ class Driver(models.Model):
 
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    driving_license_no = models.CharField(max_length=100)
+    driving_license_no = models.CharField(max_length=100, unique=True)
     vehicle_type = models.CharField(max_length=20, choices=VEHICLE_CHOICES)
-    number_plate_no = models.CharField(max_length=50)
+    number_plate_no = models.CharField(max_length=50, unique=True)
     vehicle_speed = models.DecimalField(max_digits=5, decimal_places=2)
     location = gis_models.PointField(geography=True, null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='offline')

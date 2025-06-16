@@ -2,9 +2,13 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 
 from .models import Order
-from .serializers import BatchedOrderSerializer, OrderListSerializer, CustomerOrderSerializer
+from .serializers import (
+    BatchedOrderSerializer, OrderListSerializer, CustomerOrderSerializer,
+    OrderStatusUpdateSerializer
+)
 from users.permissions import IsSupplier, IsDriver
 from .utils import send_order_notification
 
@@ -22,6 +26,8 @@ class OrderViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return BatchedOrderSerializer
+        elif self.action == 'update_status':
+            return OrderStatusUpdateSerializer
         elif self.request.user.is_customer:
             return CustomerOrderSerializer
         return OrderListSerializer
@@ -40,6 +46,50 @@ class OrderViewSet(ModelViewSet):
         elif user.is_customer:
             return Order.objects.filter(deliveries__customer__user=user).distinct()
         return Order.objects.none()
+
+    @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated, IsDriver])
+    def update_status(self, request, pk=None):
+        order = self.get_object()
+        
+        # Verify that the order belongs to the requesting driver
+        if order.driver.user != request.user:
+            return Response(
+                {"detail": "You can only update status of orders assigned to you."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = self.get_serializer(order, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+
+        # Get users to notify about status change
+        users_to_notify = []
+        users_to_notify.append(order.supplier.user)  # Notify supplier
+        customer_users = [delivery.customer.user for delivery in order.deliveries.all()]
+        users_to_notify.extend(customer_users)  # Notify customers
+
+        # Prepare notification data
+        status_display = dict(Order.status_choices)[order.status]
+        title = f"Order Status Updated"
+        body = f"Order {order.order_id} status has been updated to {status_display}."
+        
+        data = {
+            'order_id': str(order.order_id),
+            'type': 'order_updated',
+            'status': order.status,
+            'status_display': status_display
+        }
+        
+        send_order_notification(
+            order=order,
+            notification_type='order_updated',
+            users=users_to_notify,
+            title=title,
+            body=body,
+            data=data
+        )
+
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         supplier = request.user.supplier

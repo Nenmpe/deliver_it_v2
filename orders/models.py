@@ -31,8 +31,10 @@ class Notification(models.Model):
 class Order(models.Model):
     status_choices = [
         ('pending', 'Pending'),
+        ('picked_up', 'Picked Up'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
     ]
 
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

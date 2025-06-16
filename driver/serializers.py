@@ -32,6 +32,16 @@ class DriverSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid user type for supplier signup.")
         return attrs
 
+    def validate_driving_license_no(self, value):
+        if Driver.objects.filter(driving_license_no=value).exists():
+            raise serializers.ValidationError("A driver with this license number already exists.")
+        return value
+
+    def validate_number_plate_no(self, value):
+        if Driver.objects.filter(number_plate_no=value).exists():
+            raise serializers.ValidationError("A driver with this vehicle number already exists.")
+        return value
+
     def create(self, validated_data):
         license_no = validated_data.pop('driving_license_no', None)
         vehicle_type = validated_data.pop('vehicle_type', None)
