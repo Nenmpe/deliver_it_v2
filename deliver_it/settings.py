@@ -1,15 +1,38 @@
-from datetime import timedelta
 import os
+import sys
+import ctypes.util
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Detect GDAL library path based on platform and environment
+GDAL_LIBRARY_PATH = ctypes.util.find_library('gdal')
 
-# Quick-start development settings - unsuitable for production
+if GDAL_LIBRARY_PATH is None:
+    if sys.platform == 'win32':
+        GDAL_LIBRARY_PATH = os.path.join(os.environ.get('CONDA_PREFIX', ''), 'Library', 'bin', 'gdal.dll')
+    elif sys.platform == 'darwin':
+        conda_prefix = os.environ.get('CONDA_PREFIX')
+        if conda_prefix:
+            GDAL_LIBRARY_PATH = os.path.join(conda_prefix, 'lib', 'libgdal.dylib')
+        else:
+            GDAL_LIBRARY_PATH = '/opt/homebrew/lib/libgdal.dylib'
+    else:
+        # Linux or other Unix systems
+        conda_prefix = os.environ.get('CONDA_PREFIX')
+        if conda_prefix:
+            GDAL_LIBRARY_PATH = os.path.join(conda_prefix, 'lib', 'libgdal.so')
+        else:
+            GDAL_LIBRARY_PATH = None  # Set custom path if needed
+
+print("GDAL_LIBRARY_PATH:", GDAL_LIBRARY_PATH)
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-h48t$2zs$&2_#$=mo*g@n-j14ri^=$wn9bgze*v)%t0oone6ik'
@@ -22,14 +45,13 @@ ALLOWED_HOSTS = [
     '192.168.11.116',
     'localhost',
     '127.0.0.1',
-    '192.168.254.22',
+    '192.168.254.35',
     '192.168.1.165',
     '192.168.240.138',
     '192.168.18.106',
     '192.168.0.163',
     '192.168.1.176'
 ]
-
 
 # Application definition
 
@@ -45,8 +67,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django.contrib.gis',
-
-    'leaflet', # For map rendering
+    'leaflet',  # For map rendering
 
     'users',
     'supplier',
@@ -59,7 +80,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 
-# leaflet settings
+# Leaflet settings
 LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (27.7172, 85.3240),  # Kathmandu by default
     'DEFAULT_ZOOM': 13,
@@ -69,19 +90,19 @@ LEAFLET_CONFIG = {
     'ATTRIBUTION_PREFIX': 'Developed by deliver_it',
 }
 
-# Rest framework settings
+# REST framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+        'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/day',
-        'user': '1000/day'
-    }
+        'user': '1000/day',
+    },
 }
 
 # JWT settings
@@ -115,8 +136,6 @@ SIMPLE_JWT = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-GDAL_LIBRARY_PATH = os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'bin', 'gdal.dll')
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -148,10 +167,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'deliver_it.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+# Database configuration using environment variables
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -163,57 +179,40 @@ DATABASES = {
     }
 }
 
-
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
 
 # Email settings
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('HOST_EMAIL')  # Add your email
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')  # Add your app password
+EMAIL_HOST_USER = os.getenv('HOST_EMAIL')  # Your email
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')  # Your app password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Firebase Cloud Messaging settings
+
 FCM_SERVER_KEY = os.getenv('FCM_SERVER_KEY')

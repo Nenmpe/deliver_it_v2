@@ -9,4 +9,5 @@ graph_cache/
 **/__pycache__/
 
 # Ignore all .pyc, .pyo, .pyd files
-*.py[cod]
+*.py[cod]deliver_it_v2/
+.DS_Store

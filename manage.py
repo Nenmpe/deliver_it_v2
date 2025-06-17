@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os
+os.environ['GDAL_LIBRARY_PATH'] = '/opt/homebrew/lib/libgdal.dylib'
 import sys
 
 
