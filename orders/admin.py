@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, Delivery
+from .models import Order, Delivery, OrderRequest
 from leaflet.admin import LeafletGeoAdmin
 
 
@@ -32,3 +32,10 @@ class DeliveryAdmin(LeafletGeoAdmin):
         return obj.price
     
     total_price.short_description = 'Total Price'
+
+
+@admin.register(OrderRequest)
+class OrderRequestAdmin(LeafletGeoAdmin):
+    list_display = ('uid', 'supplier', 'item', 'quantity', 'date', 'customer', 'is_accepted')
+    list_filter = ('supplier', 'is_accepted')
+    search_fields = ('uid', 'supplier__user__fullname', 'item__name', 'customer__user__fullname')

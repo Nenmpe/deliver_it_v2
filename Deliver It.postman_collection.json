@@ -135,72 +135,107 @@
 			"name": "customer",
 			"item": [
 				{
-					"name": "Sign Up",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"secure_password34758\",\r\n    \"password2\": \"secure_password34758\",\r\n    \"fullname\": \"John Cust\",\r\n    \"contact_no\": \"+1234567890\",\r\n    \"address\": \"123 Main St, City\",\r\n    \"country\": \"Nepal\",\r\n    \"state\": \"Kavre\",\r\n    \"city\": \"Banepa\",\r\n    \"postal_code\": \"12334\",\r\n    \"is_customer\": true, \r\n    \"terms_accepted\": true\r\n}\r\n",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "auth",
+					"item": [
+						{
+							"name": "Sign Up",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"secure_password34758\",\r\n    \"password2\": \"secure_password34758\",\r\n    \"fullname\": \"John Cust\",\r\n    \"contact_no\": \"+1234567890\",\r\n    \"address\": \"123 Main St, City\",\r\n    \"country\": \"Nepal\",\r\n    \"state\": \"Kavre\",\r\n    \"city\": \"Banepa\",\r\n    \"postal_code\": \"12334\",\r\n    \"is_customer\": true, \r\n    \"terms_accepted\": true\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/customer/signup/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"customer",
+										"signup",
+										""
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/customer/signup/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"customer",
-								"signup",
-								""
-							]
+						{
+							"name": "Log In",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"NewSecurePass123\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/customer/signin/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"customer",
+										"signin",
+										""
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Log In",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"mikeluffy5@gmail.com\",\r\n    \"password\": \"NewSecurePass123\"\r\n}\r\n",
-							"options": {
-								"raw": {
-									"language": "json"
+					"name": "home",
+					"item": [
+						{
+							"name": "list suppliers and items",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.18.106:8000/api/customer/suppliers/",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"18",
+										"106"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"customer",
+										"suppliers",
+										""
+									]
 								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/customer/signin/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"customer",
-								"signin",
-								""
-							]
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -212,6 +247,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"jon@driver.com\",\r\n    \"password\": \"secure_password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/driver/signin/",
 							"protocol": "http",
@@ -278,13 +322,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NDg0NTY4LCJpYXQiOjE3NDk0ODA5NjgsImp0aSI6ImQ3YWJlOGE4NzZmMzQwNWQ5Y2Q5MzBhYWMzNDUyMzQwIiwidXNlcl9pZCI6Mn0.31h_8KRj1TcyPgVPfpiDTmGxYaPu8T79HGdo2KMTuHo",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMzQzOTM4LCJpYXQiOjE3NTAzNDAzMzgsImp0aSI6IjJjYThmNjM3ZDlmZDQzYzE5NzEzYTAwNDE2ZjE5MTBlIiwidXNlcl9pZCI6Mn0.NzkX030wJGtNw2j0JdXrw_vYCmox1OPmtTdP4l3RH9I",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "// {\r\n//   \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\r\n//   \"longitude\": 85.270901,\r\n//   \"latitude\": 27.694928,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n\r\n// {\r\n//   \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n//   \"longitude\": 85.269527,\r\n//   \"latitude\": 27.717117,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n{\r\n  \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n  \"delivery_date\": \"2025-06-29T12:00:00Z\",\r\n  \"orders\":[\r\n    {\r\n        \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n        \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n        \"qty\": 3,\r\n        \"longitude\": 85.269527,\r\n        \"latitude\": 27.717117,\r\n        \"instruction\": \"Handle with care\"\r\n    },\r\n\r\n    {\r\n        \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\r\n        \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\r\n        \"qty\": 3,\r\n        \"longitude\": 85.313516,\r\n        \"latitude\": 27.714249,\r\n        \"instruction\": \"Handle with care\"\r\n    },\r\n\r\n    {\r\n        \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\r\n        \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\r\n        \"qty\": 3,\r\n        \"longitude\": 85.270901,\r\n        \"latitude\": 27.694928,\r\n        \"instruction\": \"Handle with care\"\r\n    }\r\n  ]  \r\n}\r\n\r\n\r\n// {\r\n//   \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n//   \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n//   \"qty\": 3,\r\n//   \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n//   \"longitude\": 85.313516,\r\n//   \"latitude\": 27.714249,\r\n//   \"delivery_date\": \"2025-06-20T12:00:00Z\",\r\n//   \"instruction\": \"Handle with care\"\r\n// }\r\n\r\n\r\n\r\n//85.270901 27.694928\r\n//85.269527 27.717117\r\n//85.313516 27.714249",
+							"raw": "{\r\n    // Add requestId an is_accepted when creating order through request\r\n//   \"requestId\":\"9dc259fb-c427-43ec-a0e7-3da6b4979d0e\",\r\n//   \"is_accepted\": true, // can only be true\r\n  \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\r\n  \"delivery_date\": \"2025-06-29T12:00:00Z\",\r\n  \"orders\":[\r\n    {\r\n        \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\r\n        \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n        \"qty\": 3,\r\n        \"longitude\": 85.269527,\r\n        \"latitude\": 27.717117,\r\n        \"instruction\": \"Handle with care\"\r\n    }\r\n  ]  \r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -292,13 +336,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/delivery/orders/",
+							"raw": "http://192.168.18.106:8000/api/delivery/orders/",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"192",
+								"168",
+								"18",
+								"106"
 							],
 							"port": "8000",
 							"path": [
@@ -308,6 +352,123 @@
 								""
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "list orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5OTIxODMxLCJpYXQiOjE3NDk5MTgyMzEsImp0aSI6IjM5ZTQ1NjI4OTkyOTRhMzM4MmZiNzRmYjhlOTg4NzBjIiwidXNlcl9pZCI6Mn0.r7kg83GrwZR_15pA6U-OvTQF6T4Y-zvj-57BkJq6MN0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://192.168.18.106:8000/api/delivery/orders/b63e9d0e-8764-4547-8f08-bd45c9dc0058",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"18",
+								"106"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"delivery",
+								"orders",
+								"b63e9d0e-8764-4547-8f08-bd45c9dc0058"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "list orders",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMDAwMzQ2LCJpYXQiOjE3NDk5OTY3NDYsImp0aSI6IjRjYjAzYjI5NWJiNDRhZGU5MjI2Y2QxYWQwM2U2OGMxIiwidXNlcl9pZCI6Mn0.DDxZ4aRBrkH3X8qJM274TKK4OLr39CfeZOfvVufPc1I",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://192.168.18.106:8000/api/delivery/orders/",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"18",
+										"106"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"delivery",
+										"orders",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 15 Jun 2025 14:22:06 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.8"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "17370"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Orders retrieved successfully\",\n    \"data\": [\n        {\n            \"order_id\": \"68207b55-bbff-4c50-b96e-725fcce9856e\",\n            \"supplier\": \"97e17da1-a5a4-4252-8571-863faac68b30\",\n            \"supplier_name\": \"John Supp\",\n            \"supplier_location\": {\n                \"latitude\": 27.70988,\n                \"longitude\": 85.339748\n            },\n            \"driver\": \"d9a6361c-08ba-4d4b-997b-9435f0e0c742\",\n            \"driver_name\": \"John Drive\",\n            \"delivery_date\": \"2025-06-29T12:00:00Z\",\n            \"estimated_time\": \"00:00:29\",\n            \"total_distance_km\": 14.93,\n            \"path_coords\": [\n                [\n                    27.6969232,\n                    85.3508922\n                ],\n                [\n                    27.6971345,\n                    85.3505564\n                ],\n                [\n                    27.6975075,\n                    85.3499662\n                ],\n                [\n                    27.6976024,\n                    85.3498167\n                ],\n                [\n                    27.6978738,\n                    85.3493775\n                ],\n                [\n                    27.6980459,\n                    85.3490958\n                ],\n                [\n                    27.6982445,\n                    85.3487924\n                ],\n                [\n                    27.6984283,\n                    85.3484443\n                ],\n                [\n                    27.6984912,\n                    85.3483252\n                ],\n                [\n                    27.6985374,\n                    85.3482052\n                ],\n                [\n                    27.6987484,\n                    85.3476425\n                ],\n                [\n                    27.6987869,\n                    85.3474627\n                ],\n                [\n                    27.6988193,\n                    85.3473815\n                ],\n                [\n                    27.6988728,\n                    85.3471471\n                ],\n                [\n                    27.6991103,\n                    85.3463727\n                ],\n                [\n                    27.6992229,\n                    85.3461296\n                ],\n                [\n                    27.6992826,\n                    85.3457732\n                ],\n                [\n                    27.6992951,\n                    85.345621\n                ],\n                [\n                    27.6995437,\n                    85.3456651\n                ],\n                [\n                    27.6997598,\n                    85.3457623\n                ],\n                [\n                    27.6998715,\n                    85.3457965\n                ],\n                [\n                    27.6999919,\n                    85.3458059\n                ],\n                [\n                    27.7000636,\n                    85.3458032\n                ],\n                [\n                    27.700138,\n                    85.3457845\n                ],\n                [\n                    27.7001826,\n                    85.3457845\n                ],\n                [\n                    27.7002764,\n                    85.3458301\n                ],\n                [\n                    27.7004284,\n                    85.3459012\n                ],\n                [\n                    27.7005186,\n                    85.3459387\n                ],\n                [\n                    27.7006004,\n                    85.3459669\n                ],\n                [\n                    27.7007323,\n                    85.3460138\n                ],\n                [\n                    27.700895,\n                    85.3461386\n                ],\n                [\n                    27.7010573,\n                    85.3463355\n                ],\n                [\n                    27.7012607,\n                    85.3465086\n                ],\n                [\n                    27.701782,\n                    85.3468238\n                ],\n                [\n                    27.701972,\n                    85.3469204\n                ],\n                [\n                    27.7021864,\n                    85.3469725\n                ],\n                [\n                    27.7023478,\n                    85.3468493\n                ],\n                [\n                    27.7024202,\n                    85.3467514\n                ],\n                [\n                    27.70252,\n                    85.3466382\n                ],\n                [\n                    27.7025739,\n                    85.3465308\n                ],\n                [\n                    27.7026303,\n                    85.3463994\n                ],\n                [\n                    27.7027717,\n                    85.3462613\n                ],\n                [\n                    27.7028665,\n                    85.3461495\n                ],\n                [\n                    27.7030229,\n                    85.3459797\n                ],\n                [\n                    27.7031456,\n                    85.345851\n                ],\n                [\n                    27.7032426,\n                    85.3457671\n                ],\n                [\n                    27.7034262,\n                    85.3456418\n                ],\n                [\n                    27.7036371,\n                    85.3454603\n                ],\n                [\n                    27.7037093,\n                    85.3454293\n                ],\n                [\n                    27.7038504,\n                    85.345381\n                ],\n                [\n                    27.7039984,\n                    85.3453172\n                ],\n                [\n                    27.7040564,\n                    85.3452883\n                ],\n                [\n                    27.7041412,\n                    85.3452337\n                ],\n                [\n                    27.7042152,\n                    85.3451771\n                ],\n                [\n                    27.704287,\n                    85.3451185\n                ],\n                [\n                    27.704387,\n                    85.3450441\n                ],\n                [\n                    27.7044733,\n                    85.344988\n                ],\n                [\n                    27.7045384,\n                    85.3449677\n                ],\n                [\n                    27.7046045,\n                    85.3449506\n                ],\n                [\n                    27.7046607,\n                    85.3449408\n                ],\n                [\n                    27.7047871,\n                    85.3449394\n                ],\n                [\n                    27.7050634,\n                    85.3449431\n                ],\n                [\n                    27.7053231,\n                    85.3449752\n                ],\n                [\n                    27.7054591,\n                    85.3449557\n                ],\n                [\n                    27.705548,\n                    85.3449716\n                ],\n                [\n                    27.7055546,\n                    85.3449718\n                ],\n                [\n                    27.7061527,\n                    85.3451558\n                ],\n                [\n                    27.7062275,\n                    85.3451977\n                ],\n                [\n                    27.7063297,\n                    85.345104\n                ],\n                [\n                    27.7065401,\n                    85.3448992\n                ],\n                [\n                    27.7065173,\n                    85.345181\n                ],\n                [\n                    27.7066254,\n                    85.3450531\n                ],\n                [\n                    27.7068196,\n                    85.3448065\n                ],\n                [\n                    27.706897,\n                    85.3447029\n                ],\n                [\n                    27.7070517,\n                    85.3444733\n                ],\n                [\n                    27.7071989,\n                    85.3442788\n                ],\n                [\n                    27.7074702,\n                    85.3439455\n                ],\n                [\n                    27.7076096,\n                    85.3437482\n                ],\n                [\n                    27.7076719,\n                    85.3436049\n                ],\n                [\n                    27.7076918,\n                    85.3435495\n                ],\n                [\n                    27.7077664,\n                    85.3432989\n                ],\n                [\n                    27.7078938,\n                    85.3428787\n                ],\n                [\n                    27.7079967,\n                    85.3424915\n                ],\n                [\n                    27.708055,\n                    85.3421926\n                ],\n                [\n                    27.7081307,\n                    85.3417641\n                ],\n                [\n                    27.7081595,\n                    85.3415496\n                ],\n                [\n                    27.7081752,\n                    85.341373\n                ],\n                [\n                    27.7081739,\n                    85.341202\n                ],\n                [\n                    27.7081631,\n                    85.3410648\n                ],\n                [\n                    27.7081476,\n                    85.340933\n                ],\n                [\n                    27.7080252,\n                    85.3404323\n                ],\n                [\n                    27.7081204,\n                    85.3404069\n                ],\n                [\n                    27.7082578,\n                    85.3403926\n                ],\n                [\n                    27.7083161,\n                    85.3403827\n                ],\n                [\n                    27.7083635,\n                    85.3403665\n                ],\n                [\n                    27.7084078,\n                    85.3403423\n                ],\n                [\n                    27.7084594,\n                    85.3402986\n                ],\n                [\n                    27.7086331,\n                    85.3401132\n                ],\n                [\n                    27.7087101,\n                    85.3401399\n                ],\n                [\n                    27.7087583,\n                    85.3401582\n                ],\n                [\n                    27.7088087,\n                    85.3401682\n                ],\n                [\n                    27.7088386,\n                    85.3401623\n                ],\n                [\n                    27.7088701,\n                    85.3401506\n                ],\n                [\n                    27.7092166,\n                    85.3399427\n                ],\n                [\n                    27.7094391,\n                    85.3398412\n                ],\n                [\n                    27.7094986,\n                    85.3398195\n                ],\n                [\n                    27.7095641,\n                    85.3398186\n                ],\n                [\n                    27.7096691,\n                    85.3398328\n                ],\n                [\n                    27.7096961,\n                    85.3398251\n                ],\n                [\n                    27.7097124,\n                    85.3398116\n                ],\n                [\n                    27.7098253,\n                    85.3396515\n                ],\n                [\n                    27.7099055,\n                    85.3395558\n                ],\n                [\n                    27.7099678,\n                    85.3394424\n                ],\n                [\n                    27.7100706,\n                    85.3392279\n                ],\n                [\n                    27.7101398,\n                    85.3389394\n                ],\n                [\n                    27.7101914,\n                    85.3388165\n                ],\n                [\n                    27.7102068,\n                    85.3387522\n                ],\n                [\n                    27.7102204,\n                    85.338721\n                ],\n                [\n                    27.7102369,\n                    85.338697\n                ],\n                [\n                    27.7102753,\n                    85.3386557\n                ],\n                [\n                    27.7103081,\n                    85.3386163\n                ],\n                [\n                    27.7103599,\n                    85.3385749\n                ],\n                [\n                    27.7104148,\n                    85.3385353\n                ],\n                [\n                    27.710551,\n                    85.3382978\n                ],\n                [\n                    27.7106316,\n                    85.3381321\n                ],\n                [\n                    27.7107565,\n                    85.3380069\n                ],\n                [\n                    27.7108694,\n                    85.3379327\n                ],\n                [\n                    27.7109471,\n                    85.3378422\n                ],\n                [\n                    27.7110056,\n                    85.3377874\n                ],\n                [\n                    27.7110235,\n                    85.3377705\n                ],\n                [\n                    27.7111119,\n                    85.337719\n                ],\n                [\n                    27.7111807,\n                    85.337699\n                ],\n                [\n                    27.7112594,\n                    85.3376877\n                ],\n                [\n                    27.7113324,\n                    85.3377063\n                ],\n                [\n                    27.7114025,\n                    85.3377348\n                ],\n                [\n                    27.7115986,\n                    85.3377387\n                ],\n                [\n                    27.711682,\n                    85.3380012\n                ],\n                [\n                    27.7117477,\n                    85.3381838\n                ],\n                [\n                    27.7117669,\n                    85.3379878\n                ],\n                [\n                    27.7118929,\n                    85.3370877\n                ],\n                [\n                    27.7118802,\n                    85.3369567\n                ],\n                [\n                    27.7118675,\n                    85.3368315\n                ],\n                [\n                    27.7118778,\n                    85.3367088\n                ],\n                [\n                    27.7119063,\n                    85.336555\n                ],\n                [\n                    27.7119697,\n                    85.3363331\n                ],\n                [\n                    27.7120719,\n                    85.3360352\n                ],\n                [\n                    27.7122093,\n                    85.3356427\n                ],\n                [\n                    27.7123306,\n                    85.3352668\n                ],\n                [\n                    27.7123786,\n                    85.3351027\n                ],\n                [\n                    27.7124699,\n                    85.3348254\n                ],\n                [\n                    27.7124881,\n                    85.3347469\n                ],\n                [\n                    27.7125224,\n                    85.334638\n                ],\n                [\n                    27.712534,\n                    85.3345871\n                ],\n                [\n                    27.7125263,\n                    85.3345514\n                ],\n                [\n                    27.712159,\n                    85.3342583\n                ],\n                [\n                    27.7118162,\n                    85.3340299\n                ],\n                [\n                    27.7114717,\n                    85.3338487\n                ],\n                [\n                    27.7114314,\n                    85.3338196\n                ],\n                [\n                    27.711454,\n                    85.3336119\n                ],\n                [\n                    27.7115943,\n                    85.3332829\n                ],\n                [\n                    27.7116967,\n                    85.3328737\n                ],\n                [\n                    27.7118105,\n                    85.3324187\n                ],\n                [\n                    27.7119629,\n                    85.331778\n                ],\n                [\n                    27.7119836,\n                    85.3316982\n                ],\n                [\n                    27.7122035,\n                    85.3308315\n                ],\n                [\n                    27.7122439,\n                    85.3306301\n                ],\n                [\n                    27.712322,\n                    85.3302685\n                ],\n                [\n                    27.7124608,\n                    85.329626\n                ],\n                [\n                    27.7125863,\n                    85.328784\n                ],\n                [\n                    27.7126007,\n                    85.3287057\n                ],\n                [\n                    27.7126414,\n                    85.3286681\n                ],\n                [\n                    27.7126702,\n                    85.3285999\n                ],\n                [\n                    27.7127244,\n                    85.3283874\n                ],\n                [\n                    27.7128278,\n                    85.3279123\n                ],\n                [\n                    27.7128842,\n                    85.3276683\n                ],\n                [\n                    27.7128821,\n                    85.3276657\n                ],\n                [\n                    27.7129142,\n                    85.3275127\n                ],\n                [\n                    27.7129467,\n                    85.3273772\n                ],\n                [\n                    27.7130486,\n                    85.3269954\n                ],\n                [\n                    27.713131,\n                    85.3266341\n                ],\n                [\n                    27.713425,\n                    85.3256548\n                ],\n                [\n                    27.7134334,\n                    85.3255804\n                ],\n                [\n                    27.713435,\n                    85.3254799\n                ],\n                [\n                    27.7134246,\n                    85.3253903\n                ],\n                [\n                    27.7132913,\n                    85.3249845\n                ],\n                [\n                    27.7131647,\n                    85.3245739\n                ],\n                [\n                    27.7132178,\n                    85.32415\n                ],\n                [\n                    27.7132677,\n                    85.3239461\n                ],\n                [\n                    27.7132796,\n                    85.3239059\n                ],\n                [\n                    27.713298,\n                    85.3238676\n                ],\n                [\n                    27.713317,\n                    85.3238144\n                ],\n                [\n                    27.7133395,\n                    85.323759\n                ],\n                [\n                    27.7133756,\n                    85.3236749\n                ],\n                [\n                    27.7135617,\n                    85.3231762\n                ],\n                [\n                    27.7136355,\n                    85.3229672\n                ],\n                [\n                    27.713667,\n                    85.3227452\n                ],\n                [\n                    27.7136714,\n                    85.3223573\n                ],\n                [\n                    27.7136702,\n                    85.3219451\n                ],\n                [\n                    27.7136476,\n                    85.3210171\n                ],\n                [\n                    27.7136614,\n                    85.3201709\n                ],\n                [\n                    27.71365,\n                    85.3199436\n                ],\n                [\n                    27.7136494,\n                    85.3198095\n                ],\n                [\n                    27.7136168,\n                    85.3195333\n                ],\n                [\n                    27.7135807,\n                    85.3193699\n                ],\n                [\n                    27.7135095,\n                    85.3191295\n                ],\n                [\n                    27.7132873,\n                    85.3182485\n                ],\n                [\n                    27.7132685,\n                    85.3181715\n                ],\n                [\n                    27.7132602,\n                    85.3181378\n                ],\n                [\n                    27.7132437,\n                    85.3180704\n                ],\n                [\n                    27.7132118,\n                    85.3178924\n                ],\n                [\n                    27.7132138,\n                    85.3178133\n                ],\n                [\n                    27.7132416,\n                    85.3176608\n                ],\n                [\n                    27.7132758,\n                    85.3175164\n                ],\n                [\n                    27.7133175,\n                    85.3173162\n                ],\n                [\n                    27.7136388,\n                    85.3155757\n                ],\n                [\n                    27.7136826,\n                    85.315416\n                ],\n                [\n                    27.7136948,\n                    85.3151995\n                ],\n                [\n                    27.7137219,\n                    85.31501\n                ],\n                [\n                    27.7137816,\n                    85.3146985\n                ],\n                [\n                    27.7138631,\n                    85.3142925\n                ],\n                [\n                    27.7139278,\n                    85.3139699\n                ],\n                [\n                    27.7139531,\n                    85.3137535\n                ],\n                [\n                    27.7140962,\n                    85.3130801\n                ],\n                [\n                    27.7142283,\n                    85.3124169\n                ],\n                [\n                    27.7142783,\n                    85.3119884\n                ],\n                [\n                    27.7143001,\n                    85.311828\n                ],\n                [\n                    27.7143373,\n                    85.3117147\n                ],\n                [\n                    27.7143742,\n                    85.3115258\n                ],\n                [\n                    27.7143755,\n                    85.3114294\n                ],\n                [\n                    27.7143814,\n                    85.3113434\n                ],\n                [\n                    27.7143431,\n                    85.3113344\n                ],\n                [\n                    27.7142948,\n                    85.3113276\n                ],\n                [\n                    27.7141639,\n                    85.3113035\n                ],\n                [\n                    27.714089,\n                    85.3112873\n                ],\n                [\n                    27.7139667,\n                    85.3112557\n                ],\n                [\n                    27.7137605,\n                    85.3112232\n                ],\n                [\n                    27.713549,\n                    85.3112098\n                ],\n                [\n                    27.7133275,\n                    85.3111857\n                ],\n                [\n                    27.7132493,\n                    85.3111729\n                ],\n                [\n                    27.7128825,\n                    85.311145\n                ],\n                [\n                    27.7127002,\n                    85.3111355\n                ],\n                [\n                    27.7123971,\n                    85.3111149\n                ],\n                [\n                    27.7123493,\n                    85.3111099\n                ],\n                [\n                    27.7123813,\n                    85.3109565\n                ],\n                [\n                    27.7123553,\n                    85.3107382\n                ],\n                [\n                    27.7122977,\n                    85.3105252\n                ],\n                [\n                    27.7122066,\n                    85.3103288\n                ],\n                [\n                    27.7116542,\n                    85.3091018\n                ],\n                [\n                    27.7114888,\n                    85.308808\n                ],\n                [\n                    27.7114815,\n                    85.3086195\n                ],\n                [\n                    27.7112986,\n                    85.3085893\n                ],\n                [\n                    27.7112318,\n                    85.3085048\n                ],\n                [\n                    27.7112003,\n                    85.3084748\n                ],\n                [\n                    27.7111429,\n                    85.3084494\n                ],\n                [\n                    27.7112028,\n                    85.3082182\n                ],\n                [\n                    27.7112499,\n                    85.3079404\n                ],\n                [\n                    27.7113049,\n                    85.3076872\n                ],\n                [\n                    27.711355,\n                    85.3074649\n                ],\n                [\n                    27.7115226,\n                    85.3065926\n                ],\n                [\n                    27.7116012,\n                    85.306361\n                ],\n                [\n                    27.7116577,\n                    85.306151\n                ],\n                [\n                    27.7117763,\n                    85.3059962\n                ],\n                [\n                    27.7120669,\n                    85.3057644\n                ],\n                [\n                    27.7121514,\n                    85.3057056\n                ],\n                [\n                    27.7123839,\n                    85.3053212\n                ],\n                [\n                    27.7125189,\n                    85.3050787\n                ],\n                [\n                    27.7126936,\n                    85.3047019\n                ],\n                [\n                    27.7128048,\n                    85.304432\n                ],\n                [\n                    27.7128746,\n                    85.3041708\n                ],\n                [\n                    27.7130105,\n                    85.3040294\n                ],\n                [\n                    27.7131299,\n                    85.3039284\n                ],\n                [\n                    27.7132007,\n                    85.3038704\n                ],\n                [\n                    27.7133512,\n                    85.303719\n                ],\n                [\n                    27.7135435,\n                    85.3034966\n                ],\n                [\n                    27.7136102,\n                    85.3034259\n                ],\n                [\n                    27.7136578,\n                    85.3033738\n                ],\n                [\n                    27.7137332,\n                    85.3032973\n                ],\n                [\n                    27.7137938,\n                    85.3032515\n                ],\n                [\n                    27.713766,\n                    85.3031645\n                ],\n                [\n                    27.71374,\n                    85.3026668\n                ],\n                [\n                    27.7137228,\n                    85.3024009\n                ],\n                [\n                    27.7136251,\n                    85.301577\n                ],\n                [\n                    27.7136264,\n                    85.3015288\n                ],\n                [\n                    27.7136265,\n                    85.3014936\n                ],\n                [\n                    27.7136276,\n                    85.30145\n                ],\n                [\n                    27.7136216,\n                    85.3013713\n                ],\n                [\n                    27.7136266,\n                    85.3013292\n                ],\n                [\n                    27.7136661,\n                    85.3011631\n                ],\n                [\n                    27.7136632,\n                    85.3011418\n                ],\n                [\n                    27.7136598,\n                    85.3011079\n                ],\n                [\n                    27.7136474,\n                    85.3010699\n                ],\n                [\n                    27.7135378,\n                    85.3010087\n                ],\n                [\n                    27.7134248,\n                    85.3009565\n                ],\n                [\n                    27.7133122,\n                    85.3008894\n                ],\n                [\n                    27.7131982,\n                    85.300833\n                ],\n                [\n                    27.7131364,\n                    85.3008209\n                ],\n                [\n                    27.7129198,\n                    85.3007952\n                ],\n                [\n                    27.7126468,\n                    85.3007169\n                ],\n                [\n                    27.7126227,\n                    85.3007037\n                ],\n                [\n                    27.7125884,\n                    85.3006522\n                ],\n                [\n                    27.7126125,\n                    85.3003978\n                ],\n                [\n                    27.7126154,\n                    85.300319\n                ],\n                [\n                    27.7126216,\n                    85.3002482\n                ],\n                [\n                    27.712644,\n                    85.3001811\n                ],\n                [\n                    27.7126892,\n                    85.3001359\n                ],\n                [\n                    27.7129394,\n                    85.3001256\n                ],\n                [\n                    27.7130393,\n                    85.3000953\n                ],\n                [\n                    27.7131252,\n                    85.3000577\n                ],\n                [\n                    27.713238,\n                    85.2999786\n                ],\n                [\n                    27.7133629,\n                    85.2998363\n                ],\n                [\n                    27.71365,\n                    85.299693\n                ],\n                [\n                    27.7136689,\n                    85.2996541\n                ],\n                [\n                    27.7136672,\n                    85.2995984\n                ],\n                [\n                    27.7135419,\n                    85.2990866\n                ],\n                [\n                    27.7135008,\n                    85.2987636\n                ],\n                [\n                    27.7134994,\n                    85.298638\n                ],\n                [\n                    27.713519,\n                    85.2984331\n                ],\n                [\n                    27.7134948,\n                    85.2982472\n                ],\n                [\n                    27.7135176,\n                    85.2979189\n                ],\n                [\n                    27.7135766,\n                    85.2977901\n                ],\n                [\n                    27.7136696,\n                    85.2974906\n                ],\n                [\n                    27.7137034,\n                    85.2971558\n                ],\n                [\n                    27.7137403,\n                    85.2969558\n                ],\n                [\n                    27.7137753,\n                    85.2968409\n                ],\n                [\n                    27.7138217,\n                    85.2967564\n                ],\n                [\n                    27.713883,\n                    85.2966939\n                ],\n                [\n                    27.7140533,\n                    85.2965732\n                ],\n                [\n                    27.7141211,\n                    85.2965011\n                ],\n                [\n                    27.7141628,\n                    85.2964079\n                ],\n                [\n                    27.7141795,\n                    85.2963053\n                ],\n                [\n                    27.7142218,\n                    85.2957006\n                ],\n                [\n                    27.7142483,\n                    85.2952739\n                ],\n                [\n                    27.7142523,\n                    85.2950304\n                ],\n                [\n                    27.7142963,\n                    85.2942486\n                ],\n                [\n                    27.7143207,\n                    85.2937064\n                ],\n                [\n                    27.714342,\n                    85.2934971\n                ],\n                [\n                    27.7143592,\n                    85.2934075\n                ],\n                [\n                    27.7142665,\n                    85.2933597\n                ],\n                [\n                    27.7142289,\n                    85.2933354\n                ],\n                [\n                    27.7141503,\n                    85.2932847\n                ],\n                [\n                    27.7140024,\n                    85.2931582\n                ],\n                [\n                    27.7139453,\n                    85.293104\n                ],\n                [\n                    27.7138075,\n                    85.2929317\n                ],\n                [\n                    27.7137418,\n                    85.2927965\n                ],\n                [\n                    27.7136739,\n                    85.2926332\n                ],\n                [\n                    27.7136589,\n                    85.2925501\n                ],\n                [\n                    27.713577,\n                    85.2921838\n                ],\n                [\n                    27.7134459,\n                    85.29155\n                ],\n                [\n                    27.7134259,\n                    85.2914485\n                ],\n                [\n                    27.7133306,\n                    85.2911715\n                ],\n                [\n                    27.713133,\n                    85.2906955\n                ],\n                [\n                    27.7129443,\n                    85.2903322\n                ],\n                [\n                    27.7128827,\n                    85.290106\n                ],\n                [\n                    27.7128159,\n                    85.2899542\n                ],\n                [\n                    27.7128404,\n                    85.2898999\n                ],\n                [\n                    27.7128618,\n                    85.2898081\n                ],\n                [\n                    27.7129168,\n                    85.2896926\n                ],\n                [\n                    27.7129694,\n                    85.289652\n                ],\n                [\n                    27.7130207,\n                    85.2895484\n                ],\n                [\n                    27.7130698,\n                    85.2894512\n                ],\n                [\n                    27.7132072,\n                    85.2893149\n                ],\n                [\n                    27.7134426,\n                    85.2890748\n                ],\n                [\n                    27.7134959,\n                    85.289016\n                ],\n                [\n                    27.7136103,\n                    85.28889\n                ],\n                [\n                    27.7137524,\n                    85.2887179\n                ],\n                [\n                    27.7138256,\n                    85.2886109\n                ],\n                [\n                    27.7138447,\n                    85.2885716\n                ],\n                [\n                    27.7138706,\n                    85.2885255\n                ],\n                [\n                    27.7139045,\n                    85.2884678\n                ],\n                [\n                    27.714036,\n                    85.2881848\n                ],\n                [\n                    27.7140846,\n                    85.2880781\n                ],\n                [\n                    27.714169,\n                    85.2878824\n                ],\n                [\n                    27.7142401,\n                    85.2877298\n                ],\n                [\n                    27.7142687,\n                    85.2876181\n                ],\n                [\n                    27.7143057,\n                    85.2873994\n                ],\n                [\n                    27.7143724,\n                    85.2871411\n                ],\n                [\n                    27.7144324,\n                    85.2869817\n                ],\n                [\n                    27.7145009,\n                    85.2868581\n                ],\n                [\n                    27.7146966,\n                    85.2865849\n                ],\n                [\n                    27.7147727,\n                    85.2864646\n                ],\n                [\n                    27.7147535,\n                    85.2863899\n                ],\n                [\n                    27.7148033,\n                    85.2863116\n                ],\n                [\n                    27.7148503,\n                    85.2861715\n                ],\n                [\n                    27.7148721,\n                    85.2860705\n                ],\n                [\n                    27.714937,\n                    85.2858711\n                ],\n                [\n                    27.7150026,\n                    85.2857075\n                ],\n                [\n                    27.7150667,\n                    85.2855252\n                ],\n                [\n                    27.7149415,\n                    85.285186\n                ],\n                [\n                    27.7149304,\n                    85.2850856\n                ],\n                [\n                    27.7148869,\n                    85.2849984\n                ],\n                [\n                    27.7148623,\n                    85.2849512\n                ],\n                [\n                    27.7148423,\n                    85.2848958\n                ],\n                [\n                    27.7148275,\n                    85.2848334\n                ],\n                [\n                    27.7148419,\n                    85.2847325\n                ],\n                [\n                    27.7149114,\n                    85.2845329\n                ],\n                [\n                    27.7149504,\n                    85.2843183\n                ],\n                [\n                    27.7149425,\n                    85.2841988\n                ],\n                [\n                    27.7149113,\n                    85.2840467\n                ],\n                [\n                    27.7148854,\n                    85.2839377\n                ],\n                [\n                    27.7148259,\n                    85.2838053\n                ],\n                [\n                    27.7147323,\n                    85.2836697\n                ],\n                [\n                    27.7146851,\n                    85.2834037\n                ],\n                [\n                    27.7146612,\n                    85.2831809\n                ],\n                [\n                    27.7146077,\n                    85.2827666\n                ],\n                [\n                    27.7145439,\n                    85.2823031\n                ],\n                [\n                    27.7143561,\n                    85.2814965\n                ],\n                [\n                    27.7143095,\n                    85.2813815\n                ],\n                [\n                    27.7141706,\n                    85.2811835\n                ],\n                [\n                    27.7139516,\n                    85.2808404\n                ],\n                [\n                    27.7139029,\n                    85.2807594\n                ],\n                [\n                    27.7138488,\n                    85.2806693\n                ],\n                [\n                    27.7138132,\n                    85.2805748\n                ],\n                [\n                    27.7137899,\n                    85.2804745\n                ],\n                [\n                    27.71378,\n                    85.2802764\n                ],\n                [\n                    27.7137365,\n                    85.2800405\n                ],\n                [\n                    27.7137681,\n                    85.2797212\n                ],\n                [\n                    27.7138158,\n                    85.2793277\n                ],\n                [\n                    27.7138265,\n                    85.2791786\n                ],\n                [\n                    27.7138942,\n                    85.2788512\n                ],\n                [\n                    27.7139352,\n                    85.2787389\n                ],\n                [\n                    27.7138903,\n                    85.2784647\n                ],\n                [\n                    27.7139018,\n                    85.2783908\n                ],\n                [\n                    27.7139787,\n                    85.2781737\n                ],\n                [\n                    27.7140042,\n                    85.2779447\n                ],\n                [\n                    27.7139145,\n                    85.277912\n                ],\n                [\n                    27.7137816,\n                    85.2777751\n                ],\n                [\n                    27.713769,\n                    85.2777212\n                ],\n                [\n                    27.7137446,\n                    85.2775013\n                ],\n                [\n                    27.7138679,\n                    85.2770886\n                ],\n                [\n                    27.7138774,\n                    85.2769718\n                ],\n                [\n                    27.7138681,\n                    85.2767589\n                ],\n                [\n                    27.7138582,\n                    85.2766126\n                ],\n                [\n                    27.7138277,\n                    85.2763538\n                ],\n                [\n                    27.7137029,\n                    85.2760948\n                ],\n                [\n                    27.7136932,\n                    85.2758642\n                ],\n                [\n                    27.7137333,\n                    85.2757957\n                ],\n                [\n                    27.7138358,\n                    85.275612\n                ],\n                [\n                    27.7138623,\n                    85.2755443\n                ],\n                [\n                    27.7138938,\n                    85.2754232\n                ],\n                [\n                    27.7139315,\n                    85.2752474\n                ],\n                [\n                    27.7139462,\n                    85.2751058\n                ],\n                [\n                    27.7140243,\n                    85.2749693\n                ],\n                [\n                    27.7141685,\n                    85.2748225\n                ],\n                [\n                    27.7142277,\n                    85.2747709\n                ],\n                [\n                    27.7142936,\n                    85.2746917\n                ],\n                [\n                    27.7143588,\n                    85.2745891\n                ],\n                [\n                    27.7144398,\n                    85.2744415\n                ],\n                [\n                    27.7144826,\n                    85.2743583\n                ],\n                [\n                    27.7146156,\n                    85.2742504\n                ],\n                [\n                    27.7147024,\n                    85.2741558\n                ],\n                [\n                    27.7147895,\n                    85.2740263\n                ],\n                [\n                    27.7148774,\n                    85.273946\n                ],\n                [\n                    27.7149661,\n                    85.2738566\n                ],\n                [\n                    27.715042,\n                    85.2736574\n                ],\n                [\n                    27.7150735,\n                    85.2734911\n                ],\n                [\n                    27.7150755,\n                    85.2734106\n                ],\n                [\n                    27.7150829,\n                    85.2731133\n                ],\n                [\n                    27.71514,\n                    85.2726995\n                ],\n                [\n                    27.7152389,\n                    85.2724414\n                ],\n                [\n                    27.71526,\n                    85.2723862\n                ],\n                [\n                    27.7153047,\n                    85.2721403\n                ],\n                [\n                    27.7153858,\n                    85.272075\n                ],\n                [\n                    27.7155043,\n                    85.2719186\n                ],\n                [\n                    27.7155897,\n                    85.2718143\n                ],\n                [\n                    27.7158604,\n                    85.2716298\n                ],\n                [\n                    27.7160463,\n                    85.271511\n                ],\n                [\n                    27.7163005,\n                    85.2712806\n                ],\n                [\n                    27.7164371,\n                    85.2711331\n                ],\n                [\n                    27.7165801,\n                    85.2709886\n                ],\n                [\n                    27.716659,\n                    85.2709235\n                ],\n                [\n                    27.7167355,\n                    85.2708771\n                ],\n                [\n                    27.7169808,\n                    85.2707941\n                ],\n                [\n                    27.7171961,\n                    85.2707109\n                ],\n                [\n                    27.7173849,\n                    85.2706333\n                ],\n                [\n                    27.7175716,\n                    85.2705456\n                ],\n                [\n                    27.7176351,\n                    85.2704584\n                ],\n                [\n                    27.7178235,\n                    85.2702371\n                ],\n                [\n                    27.71797,\n                    85.2701013\n                ],\n                [\n                    27.7180561,\n                    85.2699566\n                ],\n                [\n                    27.7181026,\n                    85.2698295\n                ],\n                [\n                    27.7179745,\n                    85.2697099\n                ],\n                [\n                    27.7178104,\n                    85.2695986\n                ],\n                [\n                    27.7176032,\n                    85.2694485\n                ],\n                [\n                    27.7174088,\n                    85.2695617\n                ],\n                [\n                    27.717278,\n                    85.2696774\n                ],\n                [\n                    27.7174088,\n                    85.2695617\n                ],\n                [\n                    27.7176032,\n                    85.2694485\n                ],\n                [\n                    27.7178104,\n                    85.2695986\n                ],\n                [\n                    27.7179745,\n                    85.2697099\n                ],\n                [\n                    27.7181026,\n                    85.2698295\n                ],\n                [\n                    27.7180561,\n                    85.2699566\n                ],\n                [\n                    27.71797,\n                    85.2701013\n                ],\n                [\n                    27.7178235,\n                    85.2702371\n                ],\n                [\n                    27.7176351,\n                    85.2704584\n                ],\n                [\n                    27.7175716,\n                    85.2705456\n                ],\n                [\n                    27.7173849,\n                    85.2706333\n                ],\n                [\n                    27.7171961,\n                    85.2707109\n                ],\n                [\n                    27.7169808,\n                    85.2707941\n                ],\n                [\n                    27.7167355,\n                    85.2708771\n                ],\n                [\n                    27.716659,\n                    85.2709235\n                ],\n                [\n                    27.7165801,\n                    85.2709886\n                ],\n                [\n                    27.7164371,\n                    85.2711331\n                ],\n                [\n                    27.7163005,\n                    85.2712806\n                ],\n                [\n                    27.7160463,\n                    85.271511\n                ],\n                [\n                    27.7158604,\n                    85.2716298\n                ],\n                [\n                    27.7155897,\n                    85.2718143\n                ],\n                [\n                    27.7155043,\n                    85.2719186\n                ],\n                [\n                    27.7153858,\n                    85.272075\n                ],\n                [\n                    27.7153047,\n                    85.2721403\n                ],\n                [\n                    27.7151061,\n                    85.2722291\n                ],\n                [\n                    27.7148043,\n                    85.272424\n                ],\n                [\n                    27.7147357,\n                    85.2724832\n                ],\n                [\n                    27.7146393,\n                    85.2725717\n                ],\n                [\n                    27.7143693,\n                    85.2728761\n                ],\n                [\n                    27.714151,\n                    85.2732273\n                ],\n                [\n                    27.7136307,\n                    85.274035\n                ],\n                [\n                    27.7133369,\n                    85.2745629\n                ],\n                [\n                    27.7131133,\n                    85.2749287\n                ],\n                [\n                    27.7129277,\n                    85.2751986\n                ],\n                [\n                    27.7127845,\n                    85.2754267\n                ],\n                [\n                    27.7120678,\n                    85.2768334\n                ],\n                [\n                    27.7118878,\n                    85.2772548\n                ],\n                [\n                    27.7114483,\n                    85.278059\n                ],\n                [\n                    27.7112885,\n                    85.2783605\n                ],\n                [\n                    27.7112144,\n                    85.2784434\n                ],\n                [\n                    27.7109476,\n                    85.2787279\n                ],\n                [\n                    27.7108331,\n                    85.2788355\n                ],\n                [\n                    27.7107291,\n                    85.2789221\n                ],\n                [\n                    27.7106892,\n                    85.2789549\n                ],\n                [\n                    27.7105042,\n                    85.2790882\n                ],\n                [\n                    27.710403,\n                    85.2791931\n                ],\n                [\n                    27.7102517,\n                    85.2793504\n                ],\n                [\n                    27.7101158,\n                    85.2794754\n                ],\n                [\n                    27.7099946,\n                    85.2796125\n                ],\n                [\n                    27.7098543,\n                    85.2799262\n                ],\n                [\n                    27.7097897,\n                    85.2800432\n                ],\n                [\n                    27.7097108,\n                    85.2801763\n                ],\n                [\n                    27.7095957,\n                    85.2803779\n                ],\n                [\n                    27.7095031,\n                    85.2805221\n                ],\n                [\n                    27.7094575,\n                    85.2805644\n                ],\n                [\n                    27.7093304,\n                    85.2806714\n                ],\n                [\n                    27.7092179,\n                    85.2807737\n                ],\n                [\n                    27.7091109,\n                    85.2808548\n                ],\n                [\n                    27.7089693,\n                    85.2809687\n                ],\n                [\n                    27.7089397,\n                    85.2810098\n                ],\n                [\n                    27.7089003,\n                    85.281047\n                ],\n                [\n                    27.7088344,\n                    85.2811009\n                ],\n                [\n                    27.7087825,\n                    85.2811414\n                ],\n                [\n                    27.7086737,\n                    85.2813011\n                ],\n                [\n                    27.7086229,\n                    85.2813667\n                ],\n                [\n                    27.7085639,\n                    85.2814458\n                ],\n                [\n                    27.7081758,\n                    85.2818804\n                ],\n                [\n                    27.7078757,\n                    85.2821582\n                ],\n                [\n                    27.7077352,\n                    85.2822692\n                ],\n                [\n                    27.7076479,\n                    85.2824395\n                ],\n                [\n                    27.7076193,\n                    85.2824952\n                ],\n                [\n                    27.7074532,\n                    85.2824928\n                ],\n                [\n                    27.7070928,\n                    85.2824737\n                ],\n                [\n                    27.706675,\n                    85.2824329\n                ],\n                [\n                    27.7055666,\n                    85.2822995\n                ],\n                [\n                    27.7044231,\n                    85.2821725\n                ],\n                [\n                    27.704347,\n                    85.2821641\n                ],\n                [\n                    27.7037978,\n                    85.2820877\n                ],\n                [\n                    27.7035831,\n                    85.2820579\n                ],\n                [\n                    27.7032622,\n                    85.2820158\n                ],\n                [\n                    27.7031909,\n                    85.2820065\n                ],\n                [\n                    27.7026513,\n                    85.281941\n                ],\n                [\n                    27.7021342,\n                    85.2818675\n                ],\n                [\n                    27.7015833,\n                    85.2818236\n                ],\n                [\n                    27.7006424,\n                    85.2817152\n                ],\n                [\n                    27.7003815,\n                    85.28168\n                ],\n                [\n                    27.7002957,\n                    85.2816681\n                ],\n                [\n                    27.6996955,\n                    85.2816073\n                ],\n                [\n                    27.6996695,\n                    85.2816047\n                ],\n                [\n                    27.6996358,\n                    85.2816026\n                ],\n                [\n                    27.6994157,\n                    85.2815792\n                ],\n                [\n                    27.6992547,\n                    85.2815591\n                ],\n                [\n                    27.6989596,\n                    85.2815134\n                ],\n                [\n                    27.6989207,\n                    85.2813025\n                ],\n                [\n                    27.6986165,\n                    85.2812634\n                ],\n                [\n                    27.6982754,\n                    85.2812395\n                ],\n                [\n                    27.6980715,\n                    85.2812366\n                ],\n                [\n                    27.6979322,\n                    85.2812277\n                ],\n                [\n                    27.6974035,\n                    85.281247\n                ],\n                [\n                    27.6973807,\n                    85.2811689\n                ],\n                [\n                    27.6973782,\n                    85.2810732\n                ],\n                [\n                    27.6973548,\n                    85.2810157\n                ],\n                [\n                    27.6973647,\n                    85.2809181\n                ],\n                [\n                    27.6973664,\n                    85.2808561\n                ],\n                [\n                    27.697302,\n                    85.280786\n                ],\n                [\n                    27.6972575,\n                    85.2807384\n                ],\n                [\n                    27.6972498,\n                    85.2806663\n                ],\n                [\n                    27.6971774,\n                    85.2806512\n                ],\n                [\n                    27.697146,\n                    85.2806581\n                ],\n                [\n                    27.6971222,\n                    85.2806699\n                ],\n                [\n                    27.6970538,\n                    85.2807029\n                ],\n                [\n                    27.697001,\n                    85.2807217\n                ],\n                [\n                    27.6969661,\n                    85.2807296\n                ],\n                [\n                    27.6969535,\n                    85.280733\n                ],\n                [\n                    27.6968906,\n                    85.2807196\n                ],\n                [\n                    27.6968479,\n                    85.2806848\n                ],\n                [\n                    27.6968095,\n                    85.2805551\n                ],\n                [\n                    27.6967992,\n                    85.2805318\n                ],\n                [\n                    27.6967807,\n                    85.2804501\n                ],\n                [\n                    27.6968787,\n                    85.2801765\n                ],\n                [\n                    27.6968823,\n                    85.2801363\n                ],\n                [\n                    27.6968657,\n                    85.2801041\n                ],\n                [\n                    27.6966575,\n                    85.2799874\n                ],\n                [\n                    27.6964678,\n                    85.2799553\n                ],\n                [\n                    27.696334,\n                    85.2798907\n                ],\n                [\n                    27.6961995,\n                    85.279868\n                ],\n                [\n                    27.6960434,\n                    85.2798665\n                ],\n                [\n                    27.6959898,\n                    85.2797526\n                ],\n                [\n                    27.6957979,\n                    85.2794918\n                ],\n                [\n                    27.6956392,\n                    85.2792866\n                ],\n                [\n                    27.6955912,\n                    85.2790851\n                ],\n                [\n                    27.6955144,\n                    85.2789322\n                ],\n                [\n                    27.6954147,\n                    85.2787695\n                ],\n                [\n                    27.695293,\n                    85.2785591\n                ],\n                [\n                    27.6952964,\n                    85.2785401\n                ],\n                [\n                    27.6952728,\n                    85.2783781\n                ],\n                [\n                    27.6952549,\n                    85.2782766\n                ],\n                [\n                    27.6952236,\n                    85.2782017\n                ],\n                [\n                    27.6950219,\n                    85.2780558\n                ],\n                [\n                    27.694957,\n                    85.278022\n                ],\n                [\n                    27.694881,\n                    85.2779663\n                ],\n                [\n                    27.6948346,\n                    85.2779276\n                ],\n                [\n                    27.6945823,\n                    85.2778175\n                ],\n                [\n                    27.6942478,\n                    85.2777021\n                ],\n                [\n                    27.6939551,\n                    85.2775459\n                ],\n                [\n                    27.6939554,\n                    85.2774717\n                ],\n                [\n                    27.6940054,\n                    85.2773113\n                ],\n                [\n                    27.6940295,\n                    85.2771943\n                ],\n                [\n                    27.6940506,\n                    85.2769794\n                ],\n                [\n                    27.694053,\n                    85.2769366\n                ],\n                [\n                    27.6939751,\n                    85.2765991\n                ],\n                [\n                    27.6939488,\n                    85.2765193\n                ],\n                [\n                    27.6939415,\n                    85.2763939\n                ],\n                [\n                    27.6939625,\n                    85.2762716\n                ],\n                [\n                    27.6939532,\n                    85.2760889\n                ],\n                [\n                    27.6938583,\n                    85.2759172\n                ],\n                [\n                    27.6938256,\n                    85.275876\n                ],\n                [\n                    27.6937675,\n                    85.2758193\n                ],\n                [\n                    27.6937202,\n                    85.2756993\n                ],\n                [\n                    27.6937422,\n                    85.2755963\n                ],\n                [\n                    27.6937873,\n                    85.2754172\n                ],\n                [\n                    27.6938367,\n                    85.2752594\n                ],\n                [\n                    27.6938301,\n                    85.275108\n                ],\n                [\n                    27.6938295,\n                    85.275039\n                ],\n                [\n                    27.6937437,\n                    85.2747638\n                ],\n                [\n                    27.693797,\n                    85.2746626\n                ],\n                [\n                    27.6937736,\n                    85.2745965\n                ],\n                [\n                    27.6937775,\n                    85.2744268\n                ],\n                [\n                    27.6937925,\n                    85.2743016\n                ],\n                [\n                    27.6938294,\n                    85.2741513\n                ],\n                [\n                    27.693866,\n                    85.2739985\n                ],\n                [\n                    27.6940401,\n                    85.2735011\n                ],\n                [\n                    27.6940821,\n                    85.273463\n                ],\n                [\n                    27.6941006,\n                    85.2734473\n                ],\n                [\n                    27.6941115,\n                    85.2733378\n                ],\n                [\n                    27.6941153,\n                    85.2730885\n                ],\n                [\n                    27.6941367,\n                    85.272892\n                ],\n                [\n                    27.6941711,\n                    85.2727693\n                ],\n                [\n                    27.6942184,\n                    85.2727038\n                ],\n                [\n                    27.6942906,\n                    85.2725985\n                ],\n                [\n                    27.6943496,\n                    85.2725148\n                ],\n                [\n                    27.6945375,\n                    85.2722589\n                ],\n                [\n                    27.6947062,\n                    85.2720093\n                ],\n                [\n                    27.6947619,\n                    85.2718726\n                ],\n                [\n                    27.6947522,\n                    85.2715225\n                ],\n                [\n                    27.6947669,\n                    85.2713494\n                ],\n                [\n                    27.6947562,\n                    85.2711504\n                ],\n                [\n                    27.6947761,\n                    85.2710338\n                ]\n            ],\n            \"status\": \"pending\",\n            \"created_at\": \"2025-06-15T14:15:17.838648Z\",\n            \"deliveries\": [\n                {\n                    \"id\": 58,\n                    \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\n                    \"item_name\": \"Smart Phone\",\n                    \"qty\": 3,\n                    \"price\": \"2999.97\",\n                    \"customer\": \"0ed9816b-0bdd-4673-88e0-d0104e56dd6e\",\n                    \"customer_name\": \"John Cust\",\n                    \"delivery_location\": \"SRID=4326;POINT (85.269527 27.717117)\",\n                    \"instruction\": \"Handle with care\"\n                },\n                {\n                    \"id\": 59,\n                    \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\n                    \"item_name\": \"macbook\",\n                    \"qty\": 3,\n                    \"price\": \"360000.00\",\n                    \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\n                    \"customer_name\": \"Mike Luffy\",\n                    \"delivery_location\": \"SRID=4326;POINT (85.313516 27.714249)\",\n                    \"instruction\": \"Handle with care\"\n                },\n                {\n                    \"id\": 60,\n                    \"item\": \"96156d25-3a44-4735-9329-b7b414d70eab\",\n                    \"item_name\": \"macbook\",\n                    \"qty\": 3,\n                    \"price\": \"360000.00\",\n                    \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\n                    \"customer_name\": \"Mike Luffy\",\n                    \"delivery_location\": \"SRID=4326;POINT (85.270901 27.694928)\",\n                    \"instruction\": \"Handle with care\"\n                }\n            ]\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "update order status",
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
@@ -554,6 +715,338 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "order request",
+			"item": [
+				{
+					"name": "request creation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.18.106:8000/api/order-requests/",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"18",
+								"106"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"order-requests",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMzQzNjE3LCJpYXQiOjE3NTAzNDAwMTcsImp0aSI6Ijk5YzI4ZTc1ZWJkYTQ1MjhhZmZlZjZiODFkNWE2NzI4IiwidXNlcl9pZCI6NX0.KdPipARmXIYXHzgIfQpq-KGpoVOVcurntZ1MZWk1CQU",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"supplier\": \"97e17da1-a5a4-4252-8571-863faac68b30\",\r\n  \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\r\n  \"quantity\": 3,\r\n  \"date\": \"2025-06-29T12:00:00Z\",\r\n  \"latitude\": 27.917117,\r\n  \"longitude\": 85.969527,\r\n  \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.18.106:8000/api/delivery/order-requests/",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"18",
+										"106"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"delivery",
+										"order-requests",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 19 Jun 2025 13:37:13 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.8"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "320"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"uid\": \"9dc259fb-c427-43ec-a0e7-3da6b4979d0e\",\n    \"supplier\": \"97e17da1-a5a4-4252-8571-863faac68b30\",\n    \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\n    \"quantity\": 3,\n    \"date\": \"2025-06-29T12:00:00Z\",\n    \"delivery_location\": {\n        \"latitude\": 27.917117,\n        \"longitude\": 85.969527\n    },\n    \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\n    \"is_accepted\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "request list for customer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMzQzNjE3LCJpYXQiOjE3NTAzNDAwMTcsImp0aSI6Ijk5YzI4ZTc1ZWJkYTQ1MjhhZmZlZjZiODFkNWE2NzI4IiwidXNlcl9pZCI6NX0.KdPipARmXIYXHzgIfQpq-KGpoVOVcurntZ1MZWk1CQU",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://192.168.18.106:8000/api/delivery/order-requests/",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"18",
+								"106"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"delivery",
+								"order-requests",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMzQzNjE3LCJpYXQiOjE3NTAzNDAwMTcsImp0aSI6Ijk5YzI4ZTc1ZWJkYTQ1MjhhZmZlZjZiODFkNWE2NzI4IiwidXNlcl9pZCI6NX0.KdPipARmXIYXHzgIfQpq-KGpoVOVcurntZ1MZWk1CQU",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://192.168.18.106:8000/api/delivery/order-requests/",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"18",
+										"106"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"delivery",
+										"order-requests",
+										""
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 19 Jun 2025 13:49:04 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.8"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "321"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"uid\": \"9dc259fb-c427-43ec-a0e7-3da6b4979d0e\",\n        \"supplier\": \"97e17da1-a5a4-4252-8571-863faac68b30\",\n        \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\n        \"quantity\": 3,\n        \"date\": \"2025-06-29T12:00:00Z\",\n        \"delivery_location\": {\n            \"latitude\": 27.917117,\n            \"longitude\": 85.969527\n        },\n        \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\n        \"is_accepted\": true\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "request list for supplier",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUwMzQzOTM4LCJpYXQiOjE3NTAzNDAzMzgsImp0aSI6IjJjYThmNjM3ZDlmZDQzYzE5NzEzYTAwNDE2ZjE5MTBlIiwidXNlcl9pZCI6Mn0.NzkX030wJGtNw2j0JdXrw_vYCmox1OPmtTdP4l3RH9I",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://192.168.18.106:8000/api/delivery/order-requests/",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"18",
+										"106"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"delivery",
+										"order-requests",
+										""
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 19 Jun 2025 13:39:13 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.12.8"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "322"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"uid\": \"9dc259fb-c427-43ec-a0e7-3da6b4979d0e\",\n        \"supplier\": \"97e17da1-a5a4-4252-8571-863faac68b30\",\n        \"item\": \"c730108f-0aa5-4111-a83f-28a66bba92d9\",\n        \"quantity\": 3,\n        \"date\": \"2025-06-29T12:00:00Z\",\n        \"delivery_location\": {\n            \"latitude\": 27.917117,\n            \"longitude\": 85.969527\n        },\n        \"customer\": \"b3dedab7-4147-4990-b511-8b263c98c913\",\n        \"is_accepted\": false\n    }\n]"
+						}
+					]
 				}
 			]
 		},

@@ -9,25 +9,6 @@ from django.utils import timezone
 from users.models import User
 
 
-class Notification(models.Model):
-    NOTIFICATION_TYPES = [
-        ('order_created', 'Order Created'),
-        ('order_updated', 'Order Updated'),
-        ('order_completed', 'Order Completed'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='notifications')
-    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
-    title = models.CharField(max_length=255)
-    body = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.type} - {self.user.email}"
-
 class Order(models.Model):
     status_choices = [
         ('pending', 'Pending'),
@@ -62,3 +43,16 @@ class Delivery(models.Model):
 
     def __str__(self):
         return f"Delivery to {self.customer.user.fullname} in order {self.order.order_id}"
+
+class OrderRequest(models.Model):
+    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='order_requests')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='order_requests')
+    quantity = models.PositiveIntegerField()
+    date = models.DateTimeField()
+    delivery_location = gis_models.PointField(geography=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='order_requests')
+    is_accepted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"OrderRequest {self.uid} for {self.supplier} - {self.item}"
