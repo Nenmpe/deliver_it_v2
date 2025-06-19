@@ -12,7 +12,6 @@ import os
 from hashlib import md5
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Notification
 import requests
 
 logger = logging.getLogger(__name__)
@@ -259,66 +258,3 @@ def generate_path_matrix(delivery_points, start_point, vehicle_speed_kmph=50, su
         'estimated_time': timedelta(seconds=int(total_time)),
         'path_coords': cleaned_coords
     }
-
-
-def send_fcm_notification(fcm_token, title, body, data=None):
-    """
-    Send FCM notification to a specific device
-    """
-    if not fcm_token:
-        return None
-
-    headers = {
-        'Authorization': f'key={settings.FCM_SERVER_KEY}',
-        'Content-Type': 'application/json'
-    }
-
-    payload = {
-        'to': fcm_token,
-        'notification': {
-            'title': title,
-            'body': body,
-            'sound': 'default'
-        },
-        'data': data or {}
-    }
-
-    try:
-        response = requests.post(
-            'https://fcm.googleapis.com/fcm/send',
-            headers=headers,
-            json=payload
-        )
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        logger.error(f"Error sending FCM notification: {str(e)}")
-        return None
-
-
-def send_order_notification(order, notification_type, users, title, body, data=None):
-    """
-    Send notifications to users about an order
-    """
-    notifications = []
-    for user in users:
-        # Create notification in database
-        notification = Notification.objects.create(
-            user=user,
-            order=order,
-            type=notification_type,
-            title=title,
-            body=body
-        )
-        notifications.append(notification)
-
-        # Send FCM notification if user has FCM token
-        if hasattr(user, 'fcm_token') and user.fcm_token:
-            send_fcm_notification(
-                fcm_token=user.fcm_token,
-                title=title,
-                body=body,
-                data=data
-            )
-
-    return notifications

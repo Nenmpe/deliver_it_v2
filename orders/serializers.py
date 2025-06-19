@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, Delivery
+from .models import Order, Delivery, OrderRequest
 from driver.models import Driver
 from django.contrib.gis.geos import Point, LineString
 from .utils import generate_path_matrix
@@ -173,5 +173,36 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
             )
         
         return value
+
+class OrderRequestSerializer(serializers.ModelSerializer):
+    latitude = serializers.FloatField(write_only=True, required=True)
+    longitude = serializers.FloatField(write_only=True, required=True)
+    delivery_location = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = OrderRequest
+        fields = ['uid', 'supplier', 'item', 'quantity', 'date', 'latitude', 'longitude', 'delivery_location', 'customer', 'is_accepted']
+        read_only_fields = ['uid', 'is_accepted', 'delivery_location']
+
+    def validate(self, attrs):
+        supplier = attrs.get('supplier')
+        item = attrs.get('item')
+        if item.supplier != supplier:
+            raise serializers.ValidationError('Item must belong to the supplier.')
+        return attrs
+
+    def create(self, validated_data):
+        latitude = validated_data.pop('latitude')
+        longitude = validated_data.pop('longitude')
+        validated_data['delivery_location'] = Point(longitude, latitude)
+        return super().create(validated_data)
+
+    def get_delivery_location(self, obj):
+        if obj.delivery_location:
+            return {
+                'latitude': obj.delivery_location.y,
+                'longitude': obj.delivery_location.x
+            }
+        return None
 
 

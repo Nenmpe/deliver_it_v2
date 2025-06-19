@@ -3,14 +3,13 @@ from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-
-from .models import Order
+from .models import Order, OrderRequest
 from .serializers import (
     BatchedOrderSerializer, OrderListSerializer, CustomerOrderSerializer,
-    OrderStatusUpdateSerializer
+    OrderStatusUpdateSerializer, OrderRequestSerializer
 )
-from users.permissions import IsSupplier, IsDriver
-from .utils import send_order_notification
+from users.permissions import IsSupplier, IsDriver, IsCustomer
+from rest_framework import viewsets, mixins
 
 
 class IsSupplierOrDriverOrCustomer(BasePermission):
@@ -80,60 +79,43 @@ class OrderViewSet(ModelViewSet):
             'status_display': status_display
         }
         
-        send_order_notification(
-            order=order,
-            notification_type='order_updated',
-            users=users_to_notify,
-            title=title,
-            body=body,
-            data=data
-        )
-
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        # Check for OrderRequest update in payload
+        request_id = request.data.get('requestId')
+        is_accepted = request.data.get('is_accepted')
+        if request_id and is_accepted is True:
+            try:
+                order_request = OrderRequest.objects.get(uid=request_id)
+                order_request.is_accepted = True
+                order_request.save()
+            except OrderRequest.DoesNotExist:
+                return Response({'detail': 'OrderRequest not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Continue with normal order creation
         supplier = request.user.supplier
         context = {'request': request}
 
         serializer = self.get_serializer(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
 
-        # You don't need to validate `item.supplier` here because each item is handled in the serializer
         order = serializer.save()  # supplier is set via `get_or_create()` inside serializer
 
-        # Get all users to notify
         users_to_notify = []
-        
-        # Add driver
         if order.driver:
             users_to_notify.append(order.driver.user)
-        
-        # Add customers
         customer_users = [delivery.customer.user for delivery in order.deliveries.all()]
         users_to_notify.extend(customer_users)
 
-        # Prepare notification data
         title = "New Order Created"
         body = f"New order {order.order_id} has been created by {supplier.company_name}. "
         body += f"Delivery is scheduled for {order.delivery_date}."
-        
-        # Additional data to send with notification
         data = {
             'order_id': str(order.order_id),
             'type': 'order_created',
             'delivery_date': order.delivery_date.isoformat(),
             'supplier_name': supplier.company_name
         }
-        
-        send_order_notification(
-            order=order,
-            notification_type='order_created',
-            users=users_to_notify,
-            title=title,
-            body=body,
-            data=data
-        )
-
         return Response({
             'order_id': str(order.order_id),
             'driver_id': order.driver.uid,
@@ -169,3 +151,38 @@ class OrderViewSet(ModelViewSet):
             'status': 'success',
             'message': 'Order deleted successfully'
         }, status=status.HTTP_200_OK)
+
+
+class IsSupplierOrCustomer(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and (request.user.is_supplier or request.user.is_customer))
+
+
+class OrderRequestViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin):
+    queryset = OrderRequest.objects.all()
+    serializer_class = OrderRequestSerializer
+    permission_classes = [IsAuthenticated, IsSupplierOrCustomer]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_supplier:
+            return OrderRequest.objects.filter(supplier__user=user, is_accepted=False)
+        elif user.is_customer:
+            return OrderRequest.objects.filter(customer__user=user, is_accepted=True)
+        return OrderRequest.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_customer:
+            return Response({'detail': 'Only customers can create order requests.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().create(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        if not request.user.is_supplier:
+            return Response({'detail': 'Only suppliers can update order requests.'}, status=status.HTTP_403_FORBIDDEN)
+        instance = self.get_object()
+        if 'is_accepted' in request.data:
+            instance.is_accepted = request.data['is_accepted']
+            instance.save()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        return Response({'detail': 'No valid fields to update.'}, status=status.HTTP_400_BAD_REQUEST)
