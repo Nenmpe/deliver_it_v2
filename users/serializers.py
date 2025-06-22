@@ -68,6 +68,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'id': self.user.id,
             'email': self.user.email,
             'fullname': self.user.fullname,
+            'contact_no': self.user.contact_no,
+            'address': self.user.address,
             'is_supplier': is_supplier,
             'is_customer': is_customer,
             'is_driver': is_driver,
