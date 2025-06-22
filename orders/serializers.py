@@ -6,6 +6,9 @@ from .utils import generate_path_matrix
 from items.models import Item
 from datetime import datetime
 from django.utils.timezone import now
+from supplier.models import Supplier
+from users.models import User
+from customer.models import Customer
 
 # serializers.py
 class DeliveryInputSerializer(serializers.Serializer):
@@ -175,6 +178,9 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
         return value
 
 class OrderRequestSerializer(serializers.ModelSerializer):
+    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
+    customer = serializers.PrimaryKeyRelatedField(read_only=True)
     latitude = serializers.FloatField(write_only=True, required=True)
     longitude = serializers.FloatField(write_only=True, required=True)
     delivery_location = serializers.SerializerMethodField(read_only=True)
@@ -182,7 +188,7 @@ class OrderRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderRequest
         fields = ['uid', 'supplier', 'item', 'quantity', 'date', 'latitude', 'longitude', 'delivery_location', 'customer', 'is_accepted']
-        read_only_fields = ['uid', 'is_accepted', 'delivery_location']
+        read_only_fields = ['uid', 'is_accepted', 'delivery_location', 'customer']
 
     def validate(self, attrs):
         supplier = attrs.get('supplier')
@@ -195,7 +201,14 @@ class OrderRequestSerializer(serializers.ModelSerializer):
         latitude = validated_data.pop('latitude')
         longitude = validated_data.pop('longitude')
         validated_data['delivery_location'] = Point(longitude, latitude)
+        try:
+            validated_data['customer'] =  Customer.objects.get(user=self.context['request'].user)
+        except Customer.DoesNotExist:
+
+            raise serializers.ValidationError("Associated Customer profile not found for this user.")
+
         return super().create(validated_data)
+    
 
     def get_delivery_location(self, obj):
         if obj.delivery_location:
