@@ -12,24 +12,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h48t$2zs$&2_#$=mo*g@n-j14ri^=$wn9bgze*v)%t0oone6ik'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    '192.168.1.164',
-    '192.168.11.116',
-    'localhost',
-    '127.0.0.1',
-    '192.168.254.22',
-    '192.168.1.165',
-    '192.168.240.138',
-    '192.168.18.106',
-    '192.168.0.163',
-    '192.168.1.176',
-    '192.168.1.178'
-]
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'your-railway-app.up.railway.app').split(',')
 
 
 # Application definition
@@ -120,6 +108,7 @@ GDAL_LIBRARY_PATH = os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'bin', '
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,6 +189,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
