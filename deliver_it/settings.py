@@ -108,7 +108,6 @@ GDAL_LIBRARY_PATH = os.path.join(os.environ['CONDA_PREFIX'], 'Library', 'bin', '
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
