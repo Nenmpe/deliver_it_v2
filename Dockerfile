@@ -21,7 +21,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . /app/
 
 # Collect static files
-RUN python manage.py collectstatic --noinput
+RUN conda run -n venv python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
