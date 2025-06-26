@@ -63,8 +63,7 @@ pytest==8.3.4
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==0.21.0
-pytz==2025.2
-pywin32==308
+pytz==2023.3
 pyzmq==26.2.0
 redis==5.2.0
 requests==2.32.3
