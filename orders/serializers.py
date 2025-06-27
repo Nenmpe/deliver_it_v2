@@ -184,11 +184,11 @@ class OrderRequestSerializer(serializers.ModelSerializer):
     latitude = serializers.FloatField(write_only=True, required=True)
     longitude = serializers.FloatField(write_only=True, required=True)
     delivery_location = serializers.SerializerMethodField(read_only=True)
-
+    item_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = OrderRequest
-        fields = ['uid', 'supplier', 'item', 'quantity', 'date', 'latitude', 'longitude', 'delivery_location', 'customer', 'is_accepted']
-        read_only_fields = ['uid', 'is_accepted', 'delivery_location', 'customer']
+        fields = ['uid', 'supplier', 'item', 'item_name', 'quantity', 'date', 'latitude', 'longitude', 'delivery_location', 'customer', 'is_accepted']
+        read_only_fields = ['uid', 'is_accepted', 'delivery_location', 'customer', 'item_name']
 
     def validate(self, attrs):
         supplier = attrs.get('supplier')
@@ -217,5 +217,8 @@ class OrderRequestSerializer(serializers.ModelSerializer):
                 'longitude': obj.delivery_location.x
             }
         return None
+    
+    def get_item_name(self, obj):
+        return obj.item.name if obj.item else None
 
 
